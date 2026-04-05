@@ -3,220 +3,337 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduBudget France – Simulateur de budget Grandes Écoles</title>
+<title>EduBudget — Simulateur de budget Grandes Écoles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script>
-  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-</script>
-<script defer src="/_vercel/insights/script.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --blue-50:#eff6ff;--blue-100:#dbeafe;--blue-200:#bfdbfe;--blue-600:#2563eb;--blue-700:#1d4ed8;--blue-800:#1e40af;--blue-900:#1e3a8a;
-  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;
-  --green-50:#f0fdf4;--green-100:#dcfce7;--green-600:#16a34a;--green-700:#15803d;
-  --red-50:#fef2f2;--red-600:#dc2626;
-  --orange-50:#fff7ed;--orange-100:#ffedd5;--orange-600:#ea580c;
-  --amber-500:#f59e0b;
-  --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
-  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px rgba(0,0,0,.05);
-  --r:12px;--r-lg:16px;
+  --p:#4f46e5;--p2:#6366f1;--p3:#818cf8;--p-light:#eef2ff;--p-mid:#c7d2fe;
+  --cyan:#06b6d4;--cyan-light:#ecfeff;
+  --green:#16a34a;--green-light:#f0fdf4;--green-mid:#bbf7d0;
+  --amber:#d97706;--amber-light:#fffbeb;
+  --red:#dc2626;--red-light:#fef2f2;
+  --gray-0:#fafbff;--gray-1:#f1f5f9;--gray-2:#e2e8f0;--gray-3:#cbd5e1;
+  --gray-4:#94a3b8;--gray-5:#64748b;--gray-6:#475569;--gray-7:#334155;--gray-8:#1e293b;--gray-9:#0f172a;
+  --font:'Plus Jakarta Sans',system-ui,sans-serif;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+  --sh-md:0 4px 12px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.05);
+  --sh-lg:0 12px 32px rgba(0,0,0,.1),0 4px 10px rgba(0,0,0,.06);
+  --sh-p:0 8px 24px rgba(79,70,229,.25);
+  --r:10px;--r-lg:16px;--r-xl:24px;
 }
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--gray-50);color:var(--gray-800);line-height:1.6;min-height:100vh}
+body{font-family:var(--font);background:var(--gray-0);color:var(--gray-8);line-height:1.6;min-height:100vh}
 
-/* ── LANDING ── */
-#landing{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;background:linear-gradient(150deg,var(--blue-900) 0%,var(--blue-700) 60%,#3b82f6 100%);color:#fff}
-.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:50px;padding:6px 18px;font-size:13px;font-weight:500;margin-bottom:2rem;letter-spacing:.02em}
-#landing h1{font-size:clamp(2.2rem,5vw,3.75rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:1.25rem;max-width:800px}
-#landing h1 span{color:#93c5fd}
-#landing p{font-size:1.1rem;opacity:.85;max-width:580px;margin-bottom:2.5rem;line-height:1.75}
-.btn-cta{display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--blue-800);font-size:1rem;font-weight:700;padding:14px 32px;border-radius:50px;border:none;cursor:pointer;box-shadow:0 4px 24px rgba(0,0,0,.25);transition:all .2s}
-.btn-cta:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
-.l-stats{display:flex;gap:3rem;margin-top:4rem;opacity:.75;flex-wrap:wrap;justify-content:center}
-.l-stat-v{font-size:1.75rem;font-weight:800;line-height:1}
-.l-stat-l{font-size:.8rem;margin-top:2px;opacity:.8}
+/* ══════════════════ LANDING ══════════════════ */
+#landing{display:flex;flex-direction:column;min-height:100vh}
 
-/* ── WIZARD ── */
+.l-nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;position:absolute;top:0;left:0;right:0;z-index:10}
+.l-logo{font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.l-logo-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#a5f3fc,#818cf8)}
+.l-nav-cta{padding:8px 20px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:50px;font-size:.85rem;font-weight:600;cursor:pointer;backdrop-filter:blur(8px);transition:all .2s}
+.l-nav-cta:hover{background:rgba(255,255,255,.25)}
+
+.l-hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:7rem 2rem 4rem;position:relative;overflow:hidden;background:linear-gradient(150deg,#1e1b4b 0%,#312e81 30%,#1e3a8a 65%,#0c4a6e 100%)}
+.l-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(129,140,248,.2),transparent),radial-gradient(ellipse 50% 40% at 80% 100%,rgba(6,182,212,.15),transparent);pointer-events:none}
+
+.l-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:50px;padding:6px 16px;font-size:12px;font-weight:600;color:#c7d2fe;margin-bottom:1.75rem;letter-spacing:.02em;position:relative;z-index:1}
+.l-badge-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;flex-shrink:0}
+
+.l-hero h1{font-size:clamp(2rem,5vw,3.5rem);font-weight:800;line-height:1.1;letter-spacing:-.035em;color:#fff;max-width:760px;margin-bottom:1.25rem;position:relative;z-index:1}
+.l-hero h1 em{font-style:normal;background:linear-gradient(135deg,#a5f3fc,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.l-hero p{font-size:1.05rem;color:rgba(255,255,255,.75);max-width:540px;margin-bottom:2.5rem;line-height:1.75;position:relative;z-index:1}
+
+.l-cta-group{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1}
+.btn-hero{display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--p);font-size:1rem;font-weight:700;padding:14px 30px;border-radius:50px;border:none;cursor:pointer;box-shadow:var(--sh-p),0 0 0 0 rgba(255,255,255,0);transition:all .22s;font-family:var(--font)}
+.btn-hero:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(79,70,229,.35)}
+.btn-hero-arr{display:inline-flex;transition:transform .2s}
+.btn-hero:hover .btn-hero-arr{transform:translateX(3px)}
+.btn-hero-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.85);font-size:.9rem;font-weight:600;padding:13px 24px;border-radius:50px;cursor:pointer;font-family:var(--font);transition:all .2s}
+.btn-hero-ghost:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.4)}
+
+.l-chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:2.5rem;position:relative;z-index:1}
+.l-chip{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:50px;padding:7px 14px;font-size:.8rem;color:rgba(255,255,255,.8);font-weight:500}
+
+.l-features{background:#fff;padding:4rem 2rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;max-width:960px;margin:0 auto;width:100%}
+.l-feat{background:var(--gray-0);border:1px solid var(--gray-2);border-radius:var(--r-lg);padding:1.5rem;transition:all .2s}
+.l-feat:hover{border-color:var(--p-mid);box-shadow:var(--sh-md);transform:translateY(-2px)}
+.l-feat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;margin-bottom:1rem}
+.l-feat-icon.blue{background:var(--p-light)}
+.l-feat-icon.cyan{background:var(--cyan-light)}
+.l-feat-icon.green{background:var(--green-light)}
+.l-feat-icon.amber{background:var(--amber-light)}
+.l-feat h3{font-size:.95rem;font-weight:700;color:var(--gray-8);margin-bottom:.35rem}
+.l-feat p{font-size:.82rem;color:var(--gray-5);line-height:1.6}
+
+.l-footer{text-align:center;padding:1.5rem;font-size:.78rem;color:var(--gray-4);border-top:1px solid var(--gray-2);background:#fff}
+
+/* ══════════════════ WIZARD ══════════════════ */
 #wizard,#results{display:none}
-.w-header{background:#fff;border-bottom:1px solid var(--gray-200);padding:.875rem 1.5rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:50}
-.logo{font-size:1.05rem;font-weight:800;color:var(--blue-700);letter-spacing:-.025em;white-space:nowrap}
-.pbar{flex:1;height:5px;background:var(--gray-200);border-radius:3px;overflow:hidden}
-.pbar-fill{height:100%;background:linear-gradient(90deg,var(--blue-600),#60a5fa);border-radius:3px;transition:width .4s ease}
-.step-ind{font-size:12px;color:var(--gray-500);font-weight:600;white-space:nowrap}
-.w-wrap{max-width:680px;margin:0 auto;padding:2rem 1rem 4rem}
-.step-card{background:#fff;border-radius:var(--r-lg);padding:1.75rem;border:1px solid var(--gray-200);box-shadow:var(--shadow);animation:fadeUp .25s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.step-title{font-size:1.3rem;font-weight:700;color:var(--gray-900);margin-bottom:.35rem}
-.step-sub{font-size:.88rem;color:var(--gray-500);margin-bottom:1.5rem}
 
-/* cards grid */
-.cg{display:grid;gap:10px}
-.cg-2{grid-template-columns:1fr 1fr}
-.cg-3{grid-template-columns:1fr}
-@media(min-width:480px){.cg-3{grid-template-columns:repeat(3,1fr)}}
-.c-card{border:2px solid var(--gray-200);border-radius:var(--r);padding:1.25rem 1rem;text-align:center;cursor:pointer;transition:all .18s;background:#fff}
-.c-card:hover{border-color:var(--blue-600);background:var(--blue-50)}
-.c-card.sel{border-color:var(--blue-600);background:var(--blue-50)}
-.c-card.sel-green{border-color:var(--green-600);background:var(--green-50)}
-.c-card.sel-orange{border-color:var(--orange-600);background:var(--orange-50)}
-.c-icon{font-size:1.85rem;margin-bottom:.5rem;display:block}
-.c-name{font-weight:700;font-size:.93rem;color:var(--gray-800)}
-.c-desc{font-size:.78rem;color:var(--gray-500);margin-top:3px}
-.c-price{font-size:.8rem;font-weight:600;color:var(--blue-600);margin-top:5px}
-.c-price-green{color:var(--green-600)}
+.w-bar{background:#fff;border-bottom:1px solid var(--gray-2);padding:0 1.5rem;height:60px;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.w-logo{font-size:1rem;font-weight:800;color:var(--p);letter-spacing:-.02em;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.w-logo-dot{width:7px;height:7px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--p))}
+.w-steps{display:flex;align-items:center;gap:4px;flex:1;justify-content:center}
+.w-step-dot{width:8px;height:8px;border-radius:50%;background:var(--gray-2);transition:all .3s}
+.w-step-dot.done{background:var(--p)}
+.w-step-dot.current{width:24px;border-radius:4px;background:linear-gradient(90deg,var(--p),var(--cyan))}
+.w-step-lbl{font-size:12px;color:var(--gray-5);font-weight:500;white-space:nowrap}
 
-/* school select */
-.s-select{width:100%;padding:11px 14px;border:2px solid var(--gray-200);border-radius:var(--r);font-size:.95rem;color:var(--gray-800);background:#fff;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M6 8L0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
-.s-select:focus{outline:none;border-color:var(--blue-600)}
-.s-info{background:var(--blue-50);border:1px solid var(--blue-200);border-radius:var(--r);padding:1.1rem;margin-top:.875rem;display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.s-info-item{display:flex;flex-direction:column;gap:2px}
-.si-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);font-weight:600}
-.si-val{font-size:1rem;font-weight:700;color:var(--blue-700)}
-.si-sub{font-size:.78rem;color:var(--gray-600)}
+.w-wrap{max-width:660px;margin:0 auto;padding:2rem 1rem 5rem}
+.s-card{background:#fff;border-radius:var(--r-xl);padding:2rem;border:1px solid var(--gray-2);box-shadow:var(--sh);animation:slideUp .22s cubic-bezier(.16,1,.3,1)}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-/* range slider */
-.rslider{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--gray-200);outline:none}
-.rslider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--blue-600);cursor:pointer;box-shadow:0 2px 6px rgba(37,99,235,.4)}
-.dur-val{text-align:center;font-size:2.75rem;font-weight:800;color:var(--blue-700);line-height:1;margin:.75rem 0}
-.dur-btns{display:flex;justify-content:center;gap:7px;flex-wrap:wrap}
-.d-btn{padding:7px 18px;border:2px solid var(--gray-200);border-radius:50px;background:#fff;font-size:.88rem;font-weight:600;cursor:pointer;color:var(--gray-700);transition:all .18s}
-.d-btn:hover:not(:disabled){border-color:var(--blue-600);color:var(--blue-700)}
-.d-btn.act{border-color:var(--blue-600);background:var(--blue-600);color:#fff}
-.d-btn:disabled{opacity:.35;cursor:not-allowed}
+.s-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:.5rem}
+.s-step-badge{background:linear-gradient(135deg,var(--p),var(--cyan));color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:50px;letter-spacing:.04em;text-transform:uppercase}
+.s-title{font-size:1.25rem;font-weight:800;color:var(--gray-9);margin-bottom:.3rem;letter-spacing:-.02em}
+.s-sub{font-size:.85rem;color:var(--gray-5);margin-bottom:1.5rem;line-height:1.65}
 
-/* APL toggle */
-.apl-wrap{margin-top:.875rem;background:var(--green-50);border:1px solid var(--green-100);border-radius:var(--r);padding:.9rem 1.1rem;display:flex;align-items:flex-start;gap:10px}
-.tog-lbl{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:600;color:var(--green-700);font-size:.88rem}
-.tog{width:42px;height:23px;background:var(--gray-300);border-radius:12px;position:relative;cursor:pointer;transition:background .18s;flex-shrink:0}
-.tog.on{background:var(--green-600)}
-.tog-k{position:absolute;width:17px;height:17px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .18s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.tog.on .tog-k{left:22px}
-.apl-detail{font-size:.78rem;color:var(--green-700);margin-top:5px}
+/* option cards */
+.og{display:grid;gap:10px}
+.og2{grid-template-columns:1fr 1fr}
+.og3{grid-template-columns:1fr}
+@media(min-width:480px){.og3{grid-template-columns:repeat(3,1fr)}}
 
-/* lifestyle */
-.ls-sec{margin-bottom:1.25rem}
-.ls-lbl{font-weight:600;font-size:.88rem;color:var(--gray-700);margin-bottom:.6rem;display:flex;align-items:center;gap:7px}
-.ls-preview{background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--r);padding:.9rem;margin-top:.875rem;text-align:center}
+.oc{border:2px solid var(--gray-2);border-radius:var(--r-lg);padding:1.25rem 1rem;text-align:center;cursor:pointer;transition:all .18s;background:#fff;position:relative;overflow:hidden}
+.oc::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(79,70,229,.04),rgba(6,182,212,.04));opacity:0;transition:opacity .18s}
+.oc:hover{border-color:var(--p-mid);transform:translateY(-1px);box-shadow:var(--sh-md)}
+.oc:hover::before{opacity:1}
+.oc.sel{border-color:var(--p);background:var(--p-light);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+.oc.sel-g{border-color:var(--green);background:var(--green-light);box-shadow:0 0 0 3px rgba(22,163,74,.1)}
+.oc.sel-o{border-color:#f97316;background:#fff7ed;box-shadow:0 0 0 3px rgba(249,115,22,.1)}
+.oc-check{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--p);display:none;align-items:center;justify-content:center}
+.oc.sel .oc-check{display:flex}
+.oc.sel-g .oc-check{background:var(--green)}
+.oc-icon{font-size:2rem;margin-bottom:.6rem;display:block;transition:transform .18s}
+.oc:hover .oc-icon{transform:scale(1.08)}
+.oc-name{font-weight:700;font-size:.9rem;color:var(--gray-8)}
+.oc-desc{font-size:.76rem;color:var(--gray-5);margin-top:3px;line-height:1.5}
+.oc-price{font-size:.8rem;font-weight:700;color:var(--p);margin-top:6px}
+.oc-price-g{color:var(--green)}
 
-/* notice boxes */
-.notice-blue{background:var(--blue-50);border:1px solid var(--blue-200);border-radius:var(--r);padding:.9rem 1rem;font-size:.83rem;color:var(--blue-800);margin-top:.875rem}
-.notice-orange{background:var(--orange-50);border:1px solid var(--orange-100);border-radius:var(--r);padding:.9rem 1rem;font-size:.83rem;color:#9a3412;margin-top:.875rem}
-.notice-green{background:var(--green-50);border:1px solid var(--green-100);border-radius:var(--r);padding:.9rem 1rem;font-size:.83rem;color:var(--green-700);margin-top:.875rem}
+/* selects */
+.sel-wrap{position:relative}
+.s-sel{width:100%;padding:12px 40px 12px 14px;border:2px solid var(--gray-2);border-radius:var(--r-lg);font-size:.93rem;color:var(--gray-8);background:#fff;cursor:pointer;appearance:none;font-family:var(--font);font-weight:500;transition:border-color .18s}
+.s-sel:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.sel-arr{position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--gray-4)}
+
+.s-info{background:linear-gradient(135deg,var(--p-light),var(--cyan-light));border:1px solid var(--p-mid);border-radius:var(--r-lg);padding:1.1rem;margin-top:.875rem;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.si-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-5);font-weight:700;margin-bottom:2px}
+.si-val{font-size:1rem;font-weight:800;color:var(--p);letter-spacing:-.02em}
+.si-sub{font-size:.78rem;color:var(--gray-6)}
+
+/* slider */
+.rng{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--gray-2);outline:none}
+.rng::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--cyan));cursor:pointer;box-shadow:0 2px 8px rgba(79,70,229,.35)}
+.dur-big{text-align:center;font-size:3rem;font-weight:800;color:var(--p);line-height:1;margin:.75rem 0;letter-spacing:-.04em}
+.dur-sub{text-align:center;font-size:.82rem;color:var(--gray-5);margin-bottom:.75rem}
+.dbtns{display:flex;justify-content:center;gap:7px;flex-wrap:wrap}
+.dbtn{padding:7px 18px;border:2px solid var(--gray-2);border-radius:50px;background:#fff;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--gray-6);transition:all .18s;font-family:var(--font)}
+.dbtn:hover:not(:disabled){border-color:var(--p);color:var(--p)}
+.dbtn.act{border-color:var(--p);background:var(--p);color:#fff}
+.dbtn:disabled{opacity:.3;cursor:not-allowed}
+
+/* notices */
+.notice{border-radius:var(--r-lg);padding:.9rem 1.1rem;font-size:.83rem;margin-top:.875rem;display:flex;align-items:flex-start;gap:10px;font-weight:500}
+.notice-icon{font-size:1.1rem;flex-shrink:0;margin-top:.05rem}
+.nb{background:var(--p-light);border:1px solid var(--p-mid);color:var(--p)}
+.nb .notice-icon{filter:none}
+.no{background:var(--amber-light);border:1px solid #fde68a;color:#92400e}
+.ng{background:var(--green-light);border:1px solid var(--green-mid);color:#166534}
+
+/* APL */
+.apl-box{margin-top:.875rem;background:var(--green-light);border:1.5px solid var(--green-mid);border-radius:var(--r-lg);padding:1rem 1.1rem;display:flex;align-items:flex-start;gap:10px}
+.tog-row{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;font-size:.88rem;color:#166534}
+.tog{width:42px;height:24px;background:var(--gray-3);border-radius:12px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.tog.on{background:var(--green)}
+.tog-k{position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.tog.on .tog-k{left:21px}
+
+/* tier badges */
+.tier{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;letter-spacing:.02em}
+.t1{background:#fef3c7;color:#78350f}
+.t2{background:var(--p-light);color:#3730a3}
+.t3{background:var(--green-light);color:#14532d}
 
 /* nav */
-.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--gray-100)}
-.btn-back{padding:9px 22px;border:2px solid var(--gray-200);border-radius:50px;background:#fff;font-size:.88rem;font-weight:600;cursor:pointer;color:var(--gray-700);transition:all .18s}
-.btn-back:hover{background:var(--gray-50);border-color:var(--gray-300)}
-.btn-next{padding:11px 28px;background:var(--blue-600);color:#fff;border:none;border-radius:50px;font-size:.93rem;font-weight:700;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:7px}
-.btn-next:hover{background:var(--blue-700);transform:translateY(-1px)}
-.btn-next:disabled{background:var(--gray-300);cursor:not-allowed;transform:none}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid var(--gray-1)}
+.btn-bk{padding:10px 22px;border:2px solid var(--gray-2);border-radius:50px;background:#fff;font-size:.88rem;font-weight:700;cursor:pointer;color:var(--gray-6);transition:all .18s;font-family:var(--font)}
+.btn-bk:hover{border-color:var(--gray-3);background:var(--gray-1)}
+.btn-nx{padding:12px 28px;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;border-radius:50px;font-size:.93rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;font-family:var(--font);box-shadow:0 4px 14px rgba(79,70,229,.3)}
+.btn-nx:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,70,229,.4)}
+.btn-nx:disabled{background:var(--gray-3);box-shadow:none;cursor:not-allowed;transform:none}
 
-/* city tier badges */
-.tier{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:2px 9px;border-radius:50px}
-.t1{background:#fef3c7;color:#92400e}
-.t2{background:var(--blue-50);color:var(--blue-800)}
-.t3{background:var(--green-50);color:#166534}
+/* ══════════════════ RESULTS ══════════════════ */
+.r-bar{background:#fff;border-bottom:1px solid var(--gray-2);padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 
-/* ── RESULTS ── */
-.r-wrap{max-width:860px;margin:0 auto;padding:2rem 1rem 4rem}
-.r-header{text-align:center;margin-bottom:1.75rem}
-.r-school{font-size:.93rem;color:var(--blue-600);font-weight:600;margin-bottom:.4rem}
-.r-title{font-size:1.85rem;font-weight:800;color:var(--gray-900);letter-spacing:-.025em;margin-bottom:.3rem}
-.r-sub{font-size:.85rem;color:var(--gray-500)}
+.r-wrap{max-width:900px;margin:0 auto;padding:2rem 1rem 5rem}
 
-.grand-card{background:linear-gradient(135deg,var(--blue-900),var(--blue-600));color:#fff;border-radius:var(--r-lg);padding:1.75rem 2rem;text-align:center;margin-bottom:1.25rem}
-.gc-label{font-size:.85rem;opacity:.8;margin-bottom:.4rem}
-.gc-value{font-size:2.75rem;font-weight:900;letter-spacing:-.04em;line-height:1}
-.gc-sub{font-size:.82rem;opacity:.65;margin-top:.5rem}
+.r-hero{text-align:center;margin-bottom:2rem}
+.r-school-tag{display:inline-flex;align-items:center;gap:7px;background:var(--p-light);border:1px solid var(--p-mid);border-radius:50px;padding:5px 14px;font-size:.8rem;font-weight:700;color:var(--p);margin-bottom:.75rem}
+.r-title{font-size:2rem;font-weight:800;color:var(--gray-9);letter-spacing:-.035em;margin-bottom:.3rem}
+.r-sub{font-size:.85rem;color:var(--gray-5)}
 
-.r-grid{display:grid;grid-template-columns:1fr;gap:1.1rem;margin-bottom:1.1rem}
-@media(min-width:620px){.r-grid{grid-template-columns:1fr 1fr}}
+/* KPI cards */
+.kpis{display:grid;grid-template-columns:1fr;gap:1rem;margin-bottom:1.25rem}
+@media(min-width:560px){.kpis{grid-template-columns:repeat(3,1fr)}}
+.kpi{border-radius:var(--r-xl);padding:1.5rem;position:relative;overflow:hidden}
+.kpi-main{background:linear-gradient(135deg,var(--p),#7c3aed);color:#fff}
+.kpi-sec{background:linear-gradient(135deg,#0891b2,var(--cyan));color:#fff}
+.kpi-acc{background:var(--green-light);border:1.5px solid var(--green-mid)}
+.kpi-lbl{font-size:.78rem;font-weight:600;opacity:.8;margin-bottom:.5rem;letter-spacing:.02em}
+.kpi-v{font-size:1.85rem;font-weight:800;letter-spacing:-.04em;line-height:1}
+.kpi-main .kpi-v,.kpi-sec .kpi-v{color:#fff}
+.kpi-acc .kpi-v{color:var(--green)}
+.kpi-sub{font-size:.75rem;margin-top:.4rem;opacity:.7}
+.kpi-main .kpi-sub,.kpi-sec .kpi-sub{color:#fff}
+.kpi-acc .kpi-sub{color:var(--green)}
 
-.r-card{background:#fff;border-radius:var(--r-lg);padding:1.4rem;border:1px solid var(--gray-200);box-shadow:var(--shadow)}
-.r-card-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:.9rem;border-bottom:1px solid var(--gray-100)}
-.r-card-title{font-weight:700;font-size:.95rem;color:var(--gray-800)}
-.r-line{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--gray-50);font-size:.87rem}
-.r-line:last-child{border-bottom:none}
-.r-l{color:var(--gray-600)}
-.r-v{font-weight:600;color:var(--gray-800)}
-.r-v.green{color:var(--green-600)}
-.r-v.blue{color:var(--blue-700)}
-.r-v.red{color:var(--red-600)}
-.r-line.tot{font-weight:700;border-top:1.5px solid var(--gray-200);padding-top:8px;margin-top:4px;border-bottom:none}
-.r-line.tot .r-l{color:var(--gray-800);font-size:.92rem}
-.r-line.tot .r-v{font-size:1.05rem}
+/* result cards */
+.r-grid{display:grid;grid-template-columns:1fr;gap:1rem;margin-bottom:1rem}
+@media(min-width:600px){.r-grid{grid-template-columns:1fr 1fr}}
+.r-card{background:#fff;border-radius:var(--r-xl);padding:1.4rem;border:1px solid var(--gray-2);box-shadow:var(--sh)}
+.r-card-hdr{display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding-bottom:.9rem;border-bottom:1px solid var(--gray-1)}
+.r-card-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.ri-blue{background:var(--p-light)}
+.ri-cyan{background:var(--cyan-light)}
+.ri-green{background:var(--green-light)}
+.r-card-title{font-weight:700;font-size:.93rem;color:var(--gray-8)}
+.r-card-sub{font-size:.75rem;color:var(--gray-5);margin-top:1px}
 
-.m-toggle{display:flex;background:var(--gray-100);border-radius:50px;padding:3px;width:fit-content;margin-bottom:1rem}
-.m-btn{padding:5px 14px;border:none;border-radius:50px;font-size:.8rem;font-weight:600;cursor:pointer;background:transparent;color:var(--gray-600);transition:all .18s}
-.m-btn.act{background:#fff;color:var(--blue-700);box-shadow:var(--shadow)}
+.rl{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--gray-1);font-size:.85rem}
+.rl:last-child{border-bottom:none}
+.rl-l{color:var(--gray-6)}
+.rl-v{font-weight:700;color:var(--gray-8)}
+.rl-v.g{color:var(--green)}
+.rl-v.p{color:var(--p)}
+.rl-v.r{color:var(--red)}
+.rl.tot{border-top:2px solid var(--gray-2);padding-top:9px;margin-top:5px;border-bottom:none}
+.rl.tot .rl-l{color:var(--gray-8);font-weight:700;font-size:.9rem}
+.rl.tot .rl-v{font-size:1.05rem}
 
-.chart-card{background:#fff;border-radius:var(--r-lg);padding:1.4rem;border:1px solid var(--gray-200);box-shadow:var(--shadow);margin-bottom:1.1rem}
-.chart-title{font-weight:700;font-size:.95rem;color:var(--gray-800);margin-bottom:1rem}
+.m-toggle{display:flex;background:var(--gray-1);border-radius:50px;padding:3px;width:fit-content;margin-bottom:.875rem}
+.m-btn{padding:5px 14px;border:none;border-radius:50px;font-size:.78rem;font-weight:700;cursor:pointer;background:transparent;color:var(--gray-5);transition:all .18s;font-family:var(--font)}
+.m-btn.act{background:#fff;color:var(--p);box-shadow:var(--sh)}
 
-.leg{display:flex;gap:14px;flex-wrap:wrap;margin-top:.75rem}
-.leg-item{display:flex;align-items:center;gap:5px;font-size:.78rem;color:var(--gray-600)}
-.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.chart-card{background:#fff;border-radius:var(--r-xl);padding:1.4rem;border:1px solid var(--gray-2);box-shadow:var(--sh);margin-bottom:1rem}
+.chart-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem}
+.chart-title{font-weight:700;font-size:.93rem;color:var(--gray-8)}
+.leg{display:flex;gap:14px;flex-wrap:wrap}
+.leg-i{display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--gray-5);font-weight:500}
+.leg-d{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 
-.bbar{height:7px;background:var(--gray-100);border-radius:4px;overflow:hidden;margin-top:5px;margin-bottom:10px;display:flex}
-.bs{height:100%;transition:width .5s ease}
-.bs-t{background:var(--blue-600)}.bs-h{background:var(--amber-500)}.bs-l{background:#10b981}
+/* breakdown bars */
+.bbar{height:8px;background:var(--gray-1);border-radius:4px;overflow:hidden;margin:5px 0 10px;display:flex}
+.bs{height:100%}.bs-t{background:var(--p)}.bs-h{background:var(--amber)}.bs-l{background:var(--cyan)}
 
-.yr-pill{display:inline-flex;align-items:center;gap:3px;background:var(--blue-50);color:var(--blue-700);font-size:11px;font-weight:600;padding:2px 9px;border-radius:50px;border:1px solid var(--blue-100)}
-.yr-pill.alt{background:var(--green-50);color:var(--green-700);border-color:var(--green-100)}
+.yr-pill{display:inline-flex;align-items:center;gap:3px;background:var(--p-light);color:var(--p);font-size:11px;font-weight:700;padding:2px 9px;border-radius:50px;border:1px solid var(--p-mid)}
+.yr-pill.alt{background:var(--green-light);color:var(--green);border-color:var(--green-mid)}
 
-.restart{display:block;width:100%;padding:13px;background:#fff;border:2px solid var(--gray-200);border-radius:var(--r);font-size:.93rem;font-weight:600;color:var(--gray-700);cursor:pointer;transition:all .18s;margin-top:1.25rem;text-align:center}
-.restart:hover{background:var(--gray-50);border-color:var(--gray-300)}
+.savings-banner{background:linear-gradient(135deg,var(--green-light),#dcfce7);border:1.5px solid var(--green-mid);border-radius:var(--r-xl);padding:1.4rem;margin-bottom:1rem;display:flex;align-items:center;gap:1rem}
+.sb-icon{width:48px;height:48px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.35rem;flex-shrink:0}
+.sb-v{font-size:1.75rem;font-weight:800;color:var(--green);letter-spacing:-.04em;line-height:1;margin-bottom:2px}
+.sb-lbl{font-size:.78rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.04em}
+.sb-sub{font-size:.8rem;color:#166534}
 
-.alt-banner{background:var(--green-50);border:1px solid var(--green-100);border-radius:var(--r);padding:.9rem 1.1rem;margin-top:.875rem}
-.alt-v{font-size:1.35rem;font-weight:800;color:var(--green-600)}
+.restart{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:#fff;border:2px solid var(--gray-2);border-radius:var(--r-lg);font-size:.93rem;font-weight:700;color:var(--gray-6);cursor:pointer;transition:all .2s;margin-top:1rem;font-family:var(--font)}
+.restart:hover{border-color:var(--p-mid);color:var(--p);background:var(--p-light)}
+
+/* ls = lifestyle */
+.ls-sec{margin-bottom:1.25rem}
+.ls-lbl{font-weight:700;font-size:.85rem;color:var(--gray-7);margin-bottom:.6rem;display:flex;align-items:center;gap:7px}
+.ls-prev{background:linear-gradient(135deg,var(--p-light),var(--cyan-light));border:1.5px solid var(--p-mid);border-radius:var(--r-lg);padding:1.1rem 1.25rem;margin-top:.875rem;text-align:center}
 
 .hidden{display:none!important}
-.txt-green{color:var(--green-600)}
-.txt-blue{color:var(--blue-600)}
+.fg{color:var(--green)}.fr{color:var(--red)}.fp{color:var(--p)}
 </style>
 </head>
 <body>
 
-<!-- ══ LANDING ══ -->
+<!-- ══════════ LANDING ══════════ -->
 <div id="landing">
-  <span class="badge">🎓 57 écoles · Données officielles 2024-2025</span>
-  <h1>Calculez le <span>vrai coût</span><br>d'une école de commerce</h1>
-  <p>Scolarité, logement, vie quotidienne, APL, alternance… Obtenez une estimation complète et personnalisée en moins de 3 minutes.</p>
-  <button class="btn-cta" onclick="startWizard()">Lancer la simulation →</button>
-  <div class="l-stats">
-    <div><div class="l-stat-v">57</div><div class="l-stat-l">Écoles intégrées</div></div>
-    <div><div class="l-stat-v">6</div><div class="l-stat-l">Étapes guidées</div></div>
-    <div><div class="l-stat-v">APL</div><div class="l-stat-l">Incluses dans le calcul</div></div>
-    <div><div class="l-stat-v">100%</div><div class="l-stat-l">Gratuit</div></div>
+  <nav class="l-nav">
+    <div class="l-logo"><div class="l-logo-dot"></div>EduBudget</div>
+    <button class="l-nav-cta" onclick="startWizard()">Lancer la simulation →</button>
+  </nav>
+
+  <div class="l-hero">
+    <div class="l-badge"><div class="l-badge-dot"></div>Données officielles 2024–2025</div>
+    <h1>Calculez le <em>vrai coût</em> d'une école de commerce</h1>
+    <p>Scolarité, logement, vie quotidienne, APL et alternance — une simulation complète et personnalisée en 3 minutes.</p>
+    <div class="l-cta-group">
+      <button class="btn-hero" onclick="startWizard()">
+        Lancer ma simulation
+        <span class="btn-hero-arr">→</span>
+      </button>
+      <button class="btn-hero-ghost">Voir un exemple</button>
+    </div>
+    <div class="l-chips">
+      <div class="l-chip">🎓 57 écoles intégrées</div>
+      <div class="l-chip">🏛️ APL calculées</div>
+      <div class="l-chip">💼 Alternance incluse</div>
+      <div class="l-chip">⚡ 100% gratuit</div>
+    </div>
   </div>
+
+  <div style="background:#fff;padding:3.5rem 2rem">
+    <div style="max-width:800px;margin:0 auto">
+      <p style="text-align:center;font-size:.78rem;font-weight:700;color:var(--gray-4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2rem">Ce que le simulateur calcule pour vous</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.25rem">
+        <div class="l-feat">
+          <div class="l-feat-icon blue">🎓</div>
+          <h3>Frais de scolarité réels</h3>
+          <p>22 Post-Prépa, 15 Post-Bac, 20 Bachelor/BBA — tarifs officiels 2024-2025</p>
+        </div>
+        <div class="l-feat">
+          <div class="l-feat-icon cyan">🏠</div>
+          <h3>Coût de la vie par ville</h3>
+          <p>3 tiers de villes avec loyers et transports adaptés à chaque campus</p>
+        </div>
+        <div class="l-feat">
+          <div class="l-feat-icon green">🏛️</div>
+          <h3>APL automatiques</h3>
+          <p>Calcul de l'aide au logement CAF déduit directement du budget mensuel</p>
+        </div>
+        <div class="l-feat">
+          <div class="l-feat-icon amber">💼</div>
+          <h3>Impact de l'alternance</h3>
+          <p>Scolarité offerte + 1 100€/mois de salaire sur 1 ou 2 ans selon le cursus</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="l-footer">edubudget.app · Données issues des classements officiels du Figaro Étudiant</div>
 </div>
 
-<!-- ══ WIZARD ══ -->
+<!-- ══════════ WIZARD ══════════ -->
 <div id="wizard">
-  <div class="w-header">
-    <div class="logo">EduBudget</div>
-    <div class="pbar"><div class="pbar-fill" id="pbar-fill" style="width:0%"></div></div>
-    <div class="step-ind" id="step-ind">Étape 1/6</div>
+  <div class="w-bar">
+    <div class="w-logo"><div class="w-logo-dot"></div>EduBudget</div>
+    <div class="w-steps" id="w-steps"></div>
+    <div class="w-step-lbl" id="w-lbl">Étape 1/6</div>
   </div>
   <div class="w-wrap" id="w-content"></div>
 </div>
 
-<!-- ══ RESULTS ══ -->
+<!-- ══════════ RESULTS ══════════ -->
 <div id="results">
-  <div class="w-header">
-    <div class="logo">EduBudget</div>
-    <div style="flex:1"></div>
-    <button class="btn-back" onclick="restart()">← Recommencer</button>
+  <div class="r-bar">
+    <div class="w-logo"><div class="w-logo-dot"></div>EduBudget</div>
+    <button class="btn-bk" onclick="restart()">← Recommencer</button>
   </div>
   <div class="r-wrap" id="r-content"></div>
 </div>
 
 <script>
-// ═══════════════════════════════════════
+// ════════════════════════════════════
 // DATA
-// ═══════════════════════════════════════
-const SCHOOLS = {
-  'post-prepa': [
+// ════════════════════════════════════
+const SCHOOLS={
+  'post-prepa':[
     {name:"HEC Paris",rank:1,note:"19.2/20",fees:23500,city:"Jouy-en-Josas",accred:"Equis, AACSB, Amba"},
     {name:"ESCP Business School",rank:2,note:"18.6/20",fees:22300,city:"Paris",accred:"Equis, AACSB"},
     {name:"ESSEC Business School",rank:2,note:"18.6/20",fees:22650,city:"Cergy",accred:"Equis, AACSB, Amba"},
@@ -240,7 +357,7 @@ const SCHOOLS = {
     {name:"South Champagne BS",rank:21,note:"13.3/20",fees:10000,city:"Troyes",accred:"EFMD"},
     {name:"Brest BS",rank:22,note:"13.1/20",fees:11500,city:"Brest",accred:""},
   ],
-  'post-bac': [
+  'post-bac':[
     {name:"IÉSEG School of Management",rank:1,note:"19.3/20",fees:14230,city:"Paris",accred:"Equis, AACSB, Amba"},
     {name:"Essca",rank:2,note:"18.3/20",fees:14045,city:"Angers",accred:"Equis, AACSB, Amba"},
     {name:"EM Normandie",rank:3,note:"17.5/20",fees:13750,city:"Le Havre",accred:"Equis, AACSB, Amba"},
@@ -257,7 +374,7 @@ const SCHOOLS = {
     {name:"IDRAC Business School",rank:14,note:"14.6/20",fees:10900,city:"Lyon",accred:""},
     {name:"Istec",rank:15,note:"14.3/20",fees:10600,city:"Paris",accred:""},
   ],
-  'bachelor': [
+  'bachelor':[
     {name:"ESCP Business School",rank:1,program:"BSc in Management",duration:3,fees:26600,city:"Paris"},
     {name:"ESSEC Business School",rank:2,program:"Global BBA",duration:4,fees:17500,city:"Cergy"},
     {name:"EDHEC",rank:3,program:"International BBA",duration:4,fees:18800,city:"Lille"},
@@ -280,450 +397,420 @@ const SCHOOLS = {
     {name:"IPAG",rank:20,program:"Bachelor",duration:3,fees:8900,city:"Paris"},
   ]
 };
-
-const TIERS = {
-  1:{label:"Paris / Île-de-France",rent:850,tc:38},
-  2:{label:"Grande ville",rent:600,tc:30},
-  3:{label:"Ville moyenne",rent:450,tc:25},
-};
-const TIER_CLASSES = ['','t1','t2','t3'];
-
-function getTier(city){
-  const c=city.toLowerCase();
-  const t1=['paris','jouy','cergy','suresnes','défense','defense','puteaux','courbevoie','évry','evry','massy','versailles'];
-  const t2=['lyon','bordeaux','lille','nice','aix','marseille','roubaix','sophia','montpellier','strasbourg','grenoble','nantes','toulouse'];
-  for(const k of t1) if(c.includes(k)) return 1;
-  for(const k of t2) if(c.includes(k)) return 2;
+const TIERS={1:{label:"Paris / Île-de-France",rent:850,tc:38},2:{label:"Grande ville",rent:600,tc:30},3:{label:"Ville moyenne",rent:450,tc:25}};
+const TC=['','t1','t2','t3'];
+function getTier(c){
+  const s=c.toLowerCase();
+  if(['paris','jouy','cergy','suresnes','défense','defense','puteaux','courbevoie','évry','evry'].some(k=>s.includes(k)))return 1;
+  if(['lyon','bordeaux','lille','nice','aix','marseille','roubaix','sophia','montpellier','strasbourg','grenoble','nantes','toulouse'].some(k=>s.includes(k)))return 2;
   return 3;
 }
 
-// ═══════════════════════════════════════
+// ════════════════════════════════════
 // STATE
-// ═══════════════════════════════════════
+// ════════════════════════════════════
 let S={step:1,cursus:null,school:null,duration:3,alternance:false,housing:null,apl:false,food:250,transport:'tc',leisure:100,misc:50,months:10};
 
-// ═══════════════════════════════════════
-// FORMAT
-// ═══════════════════════════════════════
+// ════════════════════════════════════
+// FORMAT & CALC
+// ════════════════════════════════════
 const f=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(Math.round(n));
-
-// ═══════════════════════════════════════
-// CALCULATIONS
-// ═══════════════════════════════════════
-function calcLiving(){
+function calcLv(){
   const td=TIERS[getTier(S.school.city)];
-  let rent=S.housing==='coloc'?Math.round(td.rent*.8):S.housing==='studio'?td.rent:0;
+  const rent=S.housing==='coloc'?Math.round(td.rent*.8):S.housing==='studio'?td.rent:0;
   const apl=(S.apl&&S.housing!=='parents')?Math.min(Math.round(rent*.35),280):0;
   const netRent=rent-apl;
   const tc=S.transport==='tc'?td.tc:S.transport==='voiture'?td.tc+100:0;
   return{rent,apl,netRent,food:S.food,tc,leisure:S.leisure,misc:S.misc,monthly:Math.round(netRent+S.food+tc+S.leisure+S.misc)};
 }
-
 function calcAll(){
-  const lv=calcLiving();
-  const dur=S.duration;
+  const lv=calcLv();const dur=S.duration;
   const altYrs=S.alternance?(S.cursus==='bachelor'?1:2):0;
-  const altIncome=1100*12;
-  let totTuition=0,totHousing=0,totLiving=0,totAlt=0;
-  const yrs=[];
+  const altInc=1100*12;
+  let tT=0,tH=0,tL=0,tA=0;const yrs=[];
   for(let y=1;y<=dur;y++){
-    const isAlt=S.alternance&&y>(dur-altYrs);
-    const tuition=isAlt?0:S.school.fees;
+    const isA=S.alternance&&y>(dur-altYrs);
+    const tuition=isA?0:S.school.fees;
     const housing=lv.netRent*S.months;
     const living=(lv.food+lv.tc+lv.leisure+lv.misc)*S.months;
-    const income=isAlt?altIncome:0;
-    totTuition+=tuition;totHousing+=housing;totLiving+=living;totAlt+=income;
-    yrs.push({y,isAlt,tuition,housing,living,income,net:tuition+housing+living-income});
+    const inc=isA?altInc:0;
+    tT+=tuition;tH+=housing;tL+=living;tA+=inc;
+    yrs.push({y,isA,tuition,housing,living,inc,net:tuition+housing+living-inc});
   }
-  const gross=totTuition+totHousing+totLiving;
-  return{lv,yrs,totTuition,totHousing,totLiving,totAlt,gross,net:gross-totAlt,altYrs,altIncome,aplTotal:lv.apl*S.months*dur};
+  const gross=tT+tH+tL;
+  return{lv,yrs,tT,tH,tL,tA,gross,net:gross-tA,altYrs,altInc,aplTotal:lv.apl*S.months*dur};
 }
 
-// ═══════════════════════════════════════
-// RENDER STEPS
-// ═══════════════════════════════════════
+// ════════════════════════════════════
+// WIZARD RENDER
+// ════════════════════════════════════
 function render(){
-  const progress=Math.round(((S.step-1)/6)*100);
-  document.getElementById('pbar-fill').style.width=progress+'%';
-  document.getElementById('step-ind').textContent=`Étape ${S.step}/6`;
-  const el=document.getElementById('w-content');
-  const map={1:step1,2:step2,3:step3,4:step4,5:step5,6:step6};
-  el.innerHTML='<div class="step-card">'+map[S.step]()+'</div>';
+  // Step dots
+  const dots=Array.from({length:6},(_,i)=>`<div class="w-step-dot ${i+1<S.step?'done':i+1===S.step?'current':''}"></div>`).join('');
+  document.getElementById('w-steps').innerHTML=dots;
+  document.getElementById('w-lbl').textContent=`Étape ${S.step}/6`;
+  const labels=['Cursus','École','Durée','Alternance','Logement','Style de vie'];
+  document.getElementById('w-content').innerHTML=`<div class="s-card">${[s1,s2,s3,s4,s5,s6][S.step-1]()}</div>`;
 }
 
-function step1(){
-  const sel=v=>`onclick="setCursus('${v}')"`;
-  return`
-    <div class="step-title">Quel cursus visez-vous ?</div>
-    <div class="step-sub">Le cursus détermine les écoles disponibles et la durée des études.</div>
-    <div class="cg cg-3">
-      <div class="c-card ${S.cursus==='post-prepa'?'sel':''}" ${sel('post-prepa')}>
-        <span class="c-icon">🎓</span>
-        <div class="c-name">Post-Prépa</div>
-        <div class="c-desc">Programme Grande École (PGE) · 3 ans</div>
-        <div class="c-price">22 écoles</div>
-      </div>
-      <div class="c-card ${S.cursus==='post-bac'?'sel':''}" ${sel('post-bac')}>
-        <span class="c-icon">📚</span>
-        <div class="c-name">Post-Bac</div>
-        <div class="c-desc">Programme 5 ans après le bac</div>
-        <div class="c-price">15 écoles</div>
-      </div>
-      <div class="c-card ${S.cursus==='bachelor'?'sel':''}" ${sel('bachelor')}>
-        <span class="c-icon">🏆</span>
-        <div class="c-name">Bachelor / BBA</div>
-        <div class="c-desc">3 ou 4 ans selon le programme</div>
-        <div class="c-price" style="color:var(--orange-600)">20 écoles</div>
-      </div>
-    </div>
-    <div class="nav">
-      <button class="btn-back" onclick="backToLanding()">← Accueil</button>
-      <button class="btn-next" onclick="next()" ${!S.cursus?'disabled':''}>Suivant →</button>
-    </div>`;
+function eyebrow(n,lbl){return`<div class="s-eyebrow"><span class="s-step-badge">Étape ${n}</span><span style="font-size:.8rem;color:var(--gray-5);font-weight:500">${lbl}</span></div>`}
+
+function s1(){return`
+  ${eyebrow(1,'Cursus')}
+  <div class="s-title">Quel cursus visez-vous ?</div>
+  <div class="s-sub">Le type de cursus détermine les écoles disponibles et la durée standard des études.</div>
+  <div class="og og3">
+    ${[
+      {v:'post-prepa',ic:'🎓',n:'Post-Prépa',d:'Programme Grande École (PGE) · 3 ans',p:'22 écoles'},
+      {v:'post-bac',ic:'📚',n:'Post-Bac',d:'Programme 5 ans après le bac',p:'15 écoles'},
+      {v:'bachelor',ic:'🏆',n:'Bachelor / BBA',d:'3 ou 4 ans selon le programme',p:'20 écoles'},
+    ].map(o=>`<div class="oc ${S.cursus===o.v?'sel':''}" onclick="setCursus('${o.v}')">
+      <div class="oc-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="oc-icon">${o.ic}</span>
+      <div class="oc-name">${o.n}</div>
+      <div class="oc-desc">${o.d}</div>
+      <div class="oc-price" ${o.v==='bachelor'?'style="color:var(--amber)"':''}>${o.p}</div>
+    </div>`).join('')}
+  </div>
+  <div class="nav">
+    <button class="btn-bk" onclick="backHome()">← Accueil</button>
+    <button class="btn-nx" onclick="nxt()" ${!S.cursus?'disabled':''}>Suivant <span>→</span></button>
+  </div>`
 }
 
-function step2(){
+function s2(){
   const list=SCHOOLS[S.cursus];
-  const opts=list.map((s,i)=>`<option value="${i}" ${S.school===s?'selected':''}>
-    ${s.rank > 0 ? s.rank+'. ':''}${s.name}${S.cursus==='bachelor'?' ('+s.program+')':''} — ${f(s.fees)}/an
-  </option>`).join('');
-
+  const opts=list.map((s,i)=>`<option value="${i}" ${S.school===s?'selected':''}>${s.rank>0?s.rank+'. ':''}${s.name}${S.cursus==='bachelor'?' ('+s.program+')':''} — ${f(s.fees)}/an</option>`).join('');
   let info='';
   if(S.school){
-    const tier=getTier(S.school.city);
-    const td=TIERS[tier];
-    if(S.cursus==='bachelor'){
-      info=`<div class="s-info">
-        <div class="s-info-item"><span class="si-lbl">Programme</span><span class="si-val" style="font-size:.9rem">${S.school.program}</span></div>
-        <div class="s-info-item"><span class="si-lbl">Durée</span><span class="si-val">${S.school.duration} ans</span></div>
-        <div class="s-info-item"><span class="si-lbl">Frais / an</span><span class="si-val">${f(S.school.fees)}</span></div>
-        <div class="s-info-item"><span class="si-lbl">Ville</span><span class="si-val" style="font-size:.85rem">${S.school.city}</span>
-          <span class="tier ${TIER_CLASSES[tier]}" style="margin-top:3px">${td.label}</span>
-        </div>
-      </div>`;
-    } else {
-      info=`<div class="s-info">
-        <div class="s-info-item"><span class="si-lbl">Note Figaro</span><span class="si-val">${S.school.note}</span></div>
-        <div class="s-info-item"><span class="si-lbl">Frais / an</span><span class="si-val">${f(S.school.fees)}</span></div>
-        <div class="s-info-item"><span class="si-lbl">Ville</span><span class="si-val" style="font-size:.85rem">${S.school.city}</span>
-          <span class="tier ${TIER_CLASSES[tier]}" style="margin-top:3px">${td.label}</span>
-        </div>
-        <div class="s-info-item"><span class="si-lbl">Accréditations</span><span class="si-sub">${S.school.accred||'N/A'}</span></div>
-      </div>`;
-    }
+    const tier=getTier(S.school.city);const td=TIERS[tier];
+    const fields=S.cursus==='bachelor'
+      ?[['Programme',S.school.program],['Durée',S.school.duration+' ans'],['Frais / an',f(S.school.fees)],['Ville',S.school.city]]
+      :[['Note Figaro',S.school.note],['Frais / an',f(S.school.fees)],['Ville',S.school.city],['Accréditations',S.school.accred||'N/A']];
+    info=`<div class="s-info">${fields.map(([l,v])=>`<div><div class="si-lbl">${l}</div><div class="si-val">${v}</div></div>`).join('')}</div>
+    <div style="margin-top:.6rem"><span class="tier ${TC[tier]}">${td.label}</span></div>`;
   }
   return`
-    <div class="step-title">Choisissez votre école</div>
-    <div class="step-sub">Frais de scolarité 2024-2025 officiels · ${list.length} établissements</div>
-    <select class="s-select" onchange="setSchool(this.value)">
-      <option value="">— Sélectionnez une école —</option>${opts}
-    </select>
+    ${eyebrow(2,'École')}
+    <div class="s-title">Choisissez votre école</div>
+    <div class="s-sub">Frais de scolarité officiels 2024–2025 — ${list.length} établissements disponibles</div>
+    <div class="sel-wrap">
+      <select class="s-sel" onchange="setSchool(this.value)">
+        <option value="">— Sélectionnez une école —</option>${opts}
+      </select>
+      <span class="sel-arr">▾</span>
+    </div>
     ${info}
     <div class="nav">
-      <button class="btn-back" onclick="prev()">← Retour</button>
-      <button class="btn-next" onclick="next()" ${!S.school?'disabled':''}>Suivant →</button>
-    </div>`;
+      <button class="btn-bk" onclick="prv()">← Retour</button>
+      <button class="btn-nx" onclick="nxt()" ${!S.school?'disabled':''}>Suivant <span>→</span></button>
+    </div>`
 }
 
-function step3(){
+function s3(){
   const locked=S.cursus==='bachelor';
-  if(locked) S.duration=S.school.duration;
-  const total=f(S.school.fees*(locked?S.school.duration:S.duration));
-  const btns=[1,2,3,4,5].map(d=>`
-    <button class="d-btn ${S.duration===d?'act':''}" onclick="setDur(${d})" ${locked&&d!==S.school.duration?'disabled':''} style="${locked&&d!==S.school.duration?'opacity:.3':''}">
-      ${d} an${d>1?'s':''}
-    </button>`).join('');
+  if(locked)S.duration=S.school.duration;
+  const tot=f(S.school.fees*(locked?S.school.duration:S.duration));
   return`
-    <div class="step-title">Durée des études</div>
-    <div class="step-sub">Combien d'années souhaitez-vous financer ?</div>
-    ${!locked?`<input type="range" class="rslider" min="1" max="5" step="1" value="${S.duration}" oninput="setDur(parseInt(this.value))" style="margin-bottom:.5rem">`:``}
-    <div class="dur-val">${S.duration} an${S.duration>1?'s':''}</div>
-    <div class="dur-btns">${btns}</div>
-    ${locked?`<div class="notice-orange">🔒 La durée du <strong>${S.school.program}</strong> est fixée à <strong>${S.school.duration} ans</strong>.</div>`:''}
-    <div class="notice-blue">💰 Frais de scolarité estimés sur ${S.duration} an${S.duration>1?'s':''} : <strong>${total}</strong></div>
+    ${eyebrow(3,'Durée')}
+    <div class="s-title">Durée des études</div>
+    <div class="s-sub">Combien d'années souhaitez-vous financer ?</div>
+    ${!locked?`<input type="range" class="rng" min="1" max="5" step="1" value="${S.duration}" oninput="setDur(parseInt(this.value))" style="margin-bottom:.25rem">`:``}
+    <div class="dur-big">${S.duration}<span style="font-size:1.5rem;font-weight:700;color:var(--gray-4)"> an${S.duration>1?'s':''}</span></div>
+    <div class="dbtns">${[1,2,3,4,5].map(d=>`<button class="dbtn ${S.duration===d?'act':''}" onclick="setDur(${d})" ${locked&&d!==S.school.duration?'disabled':''} style="${locked&&d!==S.school.duration?'opacity:.25':''}"> ${d} an${d>1?'s':''}</button>`).join('')}</div>
+    ${locked?`<div class="notice no"><span class="notice-icon">🔒</span>La durée du <strong>${S.school.program}</strong> est fixée à <strong>${S.school.duration} ans</strong>.</div>`:''}
+    <div class="notice nb"><span class="notice-icon">💰</span>Frais de scolarité estimés sur ${S.duration} an${S.duration>1?'s':''} : <strong>${tot}</strong></div>
     <div class="nav">
-      <button class="btn-back" onclick="prev()">← Retour</button>
-      <button class="btn-next" onclick="next()">Suivant →</button>
-    </div>`;
+      <button class="btn-bk" onclick="prv()">← Retour</button>
+      <button class="btn-nx" onclick="nxt()">Suivant <span>→</span></button>
+    </div>`
 }
 
-function step4(){
-  const altYrs=S.cursus==='bachelor'?1:2;
-  const altInc=altYrs*1100*12;
-  const freeText=`${altYrs} an${altYrs>1?'s':''} de scolarité offert${altYrs>1?'s':''}`;
-  const saving=f(altInc+S.school.fees*altYrs);
+function s4(){
+  const ay=S.cursus==='bachelor'?1:2;
+  const inc=ay*1100*12;
+  const sav=f(inc+S.school.fees*ay);
   return`
-    <div class="step-title">Alternance</div>
-    <div class="step-sub">L'alternance supprime les frais de scolarité sur ${altYrs === 1 ? 'la dernière année' : 'les 2 dernières années'} et génère un salaire moyen de 1 100 €/mois.</div>
-    <div class="cg cg-2">
-      <div class="c-card ${!S.alternance?'sel':''}" onclick="setAlt(false)">
-        <span class="c-icon">📖</span>
-        <div class="c-name">Formation initiale</div>
-        <div class="c-desc">Temps plein sur les cours</div>
+    ${eyebrow(4,'Alternance')}
+    <div class="s-title">Faites-vous une alternance ?</div>
+    <div class="s-sub">L'alternance supprime les frais sur ${ay===1?'la dernière année':'les 2 dernières années'} et génère un salaire moyen de 1 100 €/mois.</div>
+    <div class="og og2">
+      <div class="oc ${!S.alternance?'sel':''}" onclick="setAlt(false)">
+        <div class="oc-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="oc-icon">📖</span>
+        <div class="oc-name">Formation initiale</div>
+        <div class="oc-desc">Temps plein sur les cours</div>
       </div>
-      <div class="c-card ${S.alternance?'sel-green':''}" onclick="setAlt(true)">
-        <span class="c-icon">💼</span>
-        <div class="c-name">En alternance</div>
-        <div class="c-desc">${altYrs===1?'Dernière année':'2 dernières années'} en entreprise</div>
-        <div class="c-price c-price-green">Revenus : ${f(altInc)}</div>
+      <div class="oc ${S.alternance?'sel-g':''}" onclick="setAlt(true)">
+        <div class="oc-check" style="${S.alternance?'display:flex;background:var(--green)':''}"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="oc-icon">💼</span>
+        <div class="oc-name">En alternance</div>
+        <div class="oc-desc">${ay===1?'Dernière année':'2 dernières années'} en entreprise · 1 100€/mois</div>
+        <div class="oc-price oc-price-g">Revenus : ${f(inc)}</div>
       </div>
     </div>
-    ${S.alternance?`<div class="alt-banner">
-      <div style="font-size:.78rem;color:var(--green-700);font-weight:600;margin-bottom:3px">Économies estimées (scolarité gratuite + salaires)</div>
-      <div class="alt-v">${saving}</div>
-      <div style="font-size:.78rem;color:var(--green-700);margin-top:3px">${freeText} + ${f(altInc)} de revenus bruts</div>
-    </div>`:''}
+    ${S.alternance?`<div class="notice ng"><span class="notice-icon">🎉</span>Économie estimée (scolarité offerte + salaires) : <strong>${sav}</strong></div>`:''}
     <div class="nav">
-      <button class="btn-back" onclick="prev()">← Retour</button>
-      <button class="btn-next" onclick="next()">Suivant →</button>
-    </div>`;
+      <button class="btn-bk" onclick="prv()">← Retour</button>
+      <button class="btn-nx" onclick="nxt()">Suivant <span>→</span></button>
+    </div>`
 }
 
-function step5(){
-  const tier=getTier(S.school.city);
-  const td=TIERS[tier];
-  const rentColoc=Math.round(td.rent*.8);
-  const aplC=Math.min(Math.round(rentColoc*.35),280);
-  const aplS=Math.min(Math.round(td.rent*.35),280);
+function s5(){
+  const tier=getTier(S.school.city);const td=TIERS[tier];
+  const rC=Math.round(td.rent*.8),rS=td.rent;
+  const aplC=Math.min(Math.round(rC*.35),280),aplS=Math.min(Math.round(rS*.35),280);
   const showApl=S.housing&&S.housing!=='parents';
-  const curRent=S.housing==='coloc'?rentColoc:S.housing==='studio'?td.rent:0;
-  const curApl=S.apl&&showApl?Math.min(Math.round(curRent*.35),280):0;
+  const cr=S.housing==='coloc'?rC:S.housing==='studio'?rS:0;
+  const ca=S.apl&&showApl?Math.min(Math.round(cr*.35),280):0;
   return`
-    <div class="step-title">Logement</div>
-    <div class="step-sub">
-      Ville : <strong>${S.school.city}</strong>
-      <span class="tier ${TIER_CLASSES[tier]}" style="margin-left:8px">${td.label}</span>
+    ${eyebrow(5,'Logement')}
+    <div class="s-title">Où allez-vous habiter ?</div>
+    <div class="s-sub">Ville : <strong>${S.school.city}</strong> — <span class="tier ${TC[tier]}">${td.label}</span></div>
+    <div class="og og3">
+      ${[
+        {v:'parents',ic:'🏠',n:'Chez les parents',d:'Aucun frais de logement',p:'0€/mois'},
+        {v:'coloc',ic:'🤝',n:'Colocation',d:'−20% sur le loyer moyen de la ville',p:f(rC)+'/mois brut'},
+        {v:'studio',ic:'🏢',n:'Studio / Résidence',d:'Loyer moyen de la ville',p:f(rS)+'/mois brut'},
+      ].map(o=>`<div class="oc ${S.housing===o.v?'sel':''}" onclick="setHousing('${o.v}')">
+        <div class="oc-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="oc-icon">${o.ic}</span>
+        <div class="oc-name">${o.n}</div>
+        <div class="oc-desc">${o.d}</div>
+        <div class="oc-price">${o.p}</div>
+        ${o.v==='coloc'&&S.housing==='coloc'?`<div style="font-size:10px;color:var(--green);margin-top:4px;font-weight:700">APL possible : −${f(aplC)}/mois</div>`:''}
+        ${o.v==='studio'&&S.housing==='studio'?`<div style="font-size:10px;color:var(--green);margin-top:4px;font-weight:700">APL possible : −${f(aplS)}/mois</div>`:''}
+      </div>`).join('')}
     </div>
-    <div class="cg cg-3">
-      <div class="c-card ${S.housing==='parents'?'sel':''}" onclick="setHousing('parents')">
-        <span class="c-icon">🏠</span><div class="c-name">Chez les parents</div>
-        <div class="c-desc">Pas de frais de logement</div><div class="c-price">0 €/mois</div>
-      </div>
-      <div class="c-card ${S.housing==='coloc'?'sel':''}" onclick="setHousing('coloc')">
-        <span class="c-icon">🤝</span><div class="c-name">Colocation</div>
-        <div class="c-desc">−20% sur le loyer moyen</div>
-        <div class="c-price">${f(rentColoc)}/mois brut</div>
-        ${S.housing==='coloc'?`<div style="font-size:10px;color:var(--green-600);margin-top:3px">APL possible : −${f(aplC)}/mois</div>`:''}
-      </div>
-      <div class="c-card ${S.housing==='studio'?'sel':''}" onclick="setHousing('studio')">
-        <span class="c-icon">🏢</span><div class="c-name">Studio / Résidence</div>
-        <div class="c-desc">Loyer moyen de la ville</div>
-        <div class="c-price">${f(td.rent)}/mois brut</div>
-        ${S.housing==='studio'?`<div style="font-size:10px;color:var(--green-600);margin-top:3px">APL possible : −${f(aplS)}/mois</div>`:''}
-      </div>
-    </div>
-    ${showApl?`<div class="apl-wrap">
+    ${showApl?`<div class="apl-box">
       <div style="font-size:1.5rem">🏛️</div>
       <div style="flex:1">
-        <label class="tog-lbl" onclick="toggleApl()">
+        <label class="tog-row" onclick="toggleApl()">
           <div class="tog ${S.apl?'on':''}"><div class="tog-k"></div></div>
-          Éligible aux APL (Aide Personnalisée au Logement CAF)
+          Éligible aux APL — Aide Personnalisée au Logement (CAF)
         </label>
-        ${S.apl?`<div class="apl-detail">Déduction estimée : <strong>−${f(curApl)}/mois</strong> · Loyer net : <strong>${f(curRent-curApl)}/mois</strong></div>`:''}
+        ${S.apl?`<div style="font-size:.78rem;color:#166534;margin-top:5px;font-weight:500">Déduction estimée : <strong>−${f(ca)}/mois</strong> · Loyer net : <strong>${f(cr-ca)}/mois</strong></div>`:''}
       </div>
     </div>`:''}
     <div class="nav">
-      <button class="btn-back" onclick="prev()">← Retour</button>
-      <button class="btn-next" onclick="next()" ${!S.housing?'disabled':''}>Suivant →</button>
-    </div>`;
+      <button class="btn-bk" onclick="prv()">← Retour</button>
+      <button class="btn-nx" onclick="nxt()" ${!S.housing?'disabled':''}>Suivant <span>→</span></button>
+    </div>`
 }
 
-function step6(){
+function s6(){
   const td=TIERS[getTier(S.school.city)];
-  const tc=S.transport==='tc'?td.tc:S.transport==='voiture'?td.tc+100:0;
-  const lv=calcLiving();
-  const pct=Math.min(100,Math.round(S.leisure/3));
+  const lv=calcLv();
+  const p=Math.min(100,Math.round(S.leisure/3));
   return`
-    <div class="step-title">Style de vie</div>
-    <div class="step-sub">Estimez vos dépenses mensuelles pour affiner le budget total.</div>
+    ${eyebrow(6,'Style de vie')}
+    <div class="s-title">Vos dépenses mensuelles</div>
+    <div class="s-sub">Ajustez chaque poste pour obtenir une estimation au plus proche de votre réalité.</div>
 
     <div class="ls-sec">
       <div class="ls-lbl">🍔 Alimentation & Courses</div>
-      <div class="cg" style="grid-template-columns:repeat(3,1fr)">
+      <div class="og" style="grid-template-columns:repeat(3,1fr)">
         ${[{v:150,l:'🥦 Éco',d:'Cuisine maison'},{v:250,l:'🍽️ Standard',d:'Mixte'},{v:400,l:'🍜 Confort',d:'Livraisons/Restos'}].map(o=>`
-          <div class="c-card ${S.food===o.v?'sel':''}" onclick="setFood(${o.v})" style="padding:1rem .75rem">
-            <div class="c-name" style="font-size:.82rem">${o.l}</div>
-            <div class="c-desc">${o.d}</div>
-            <div class="c-price">${f(o.v)}/mois</div>
+          <div class="oc ${S.food===o.v?'sel':''}" onclick="setFood(${o.v})" style="padding:1rem .75rem">
+            <div class="oc-name" style="font-size:.8rem">${o.l}</div>
+            <div class="oc-desc">${o.d}</div>
+            <div class="oc-price">${f(o.v)}/mois</div>
           </div>`).join('')}
       </div>
     </div>
 
     <div class="ls-sec">
       <div class="ls-lbl">🚌 Transport</div>
-      <div class="cg" style="grid-template-columns:repeat(3,1fr)">
-        ${[{v:'tc',l:'🚌 Transports',d:`${td.tc}€/mois`},{v:'velo',l:'🚲 Vélo/Marche',d:'0€/mois'},{v:'voiture',l:'🚗 Voiture',d:`${td.tc+100}€/mois`}].map(o=>`
-          <div class="c-card ${S.transport===o.v?'sel':''}" onclick="setTransport('${o.v}')" style="padding:1rem .75rem">
-            <div class="c-name" style="font-size:.82rem">${o.l}</div>
-            <div class="c-desc">${o.d}</div>
+      <div class="og" style="grid-template-columns:repeat(3,1fr)">
+        ${[{v:'tc',l:'🚌 Transports',d:`${td.tc}€/mois`},{v:'velo',l:'🚲 Vélo',d:'0€/mois'},{v:'voiture',l:'🚗 Voiture',d:`${td.tc+100}€/mois`}].map(o=>`
+          <div class="oc ${S.transport===o.v?'sel':''}" onclick="setTransport('${o.v}')" style="padding:1rem .75rem">
+            <div class="oc-name" style="font-size:.8rem">${o.l}</div>
+            <div class="oc-desc">${o.d}</div>
           </div>`).join('')}
       </div>
     </div>
 
     <div class="ls-sec">
-      <div class="ls-lbl">🎉 Sorties & Loisirs</div>
-      <div style="display:flex;align-items:center;gap:12px;margin-top:.5rem">
-        <input type="range" class="rslider" min="0" max="300" step="10" value="${S.leisure}"
-          oninput="S.leisure=parseInt(this.value);document.getElementById('lv').textContent=new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(S.leisure);updatePreview()"
-          style="flex:1;background:linear-gradient(to right,var(--blue-600) ${pct}%,var(--gray-200) ${pct}%)" id="lslider">
-        <div style="font-size:1.15rem;font-weight:700;color:var(--blue-700);min-width:75px;text-align:right" id="lv">${f(S.leisure)}</div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-400);margin-top:3px"><span>0€</span><span>150€</span><span>300€/mois</span></div>
+      <div class="ls-lbl">🎉 Sorties & Loisirs <span style="margin-left:auto;font-size:.85rem;font-weight:800;color:var(--p)" id="lv-disp">${f(S.leisure)}/mois</span></div>
+      <input type="range" class="rng" min="0" max="300" step="10" value="${S.leisure}" id="lslider"
+        oninput="S.leisure=parseInt(this.value);document.getElementById('lv-disp').textContent=new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(S.leisure)+'/mois';this.style.background='linear-gradient(to right,var(--p) '+Math.round(S.leisure/3)+'%,var(--gray-2) '+Math.round(S.leisure/3)+'%)';updPrev()"
+        style="background:linear-gradient(to right,var(--p) ${p}%,var(--gray-2) ${p}%);margin-top:.25rem">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-4);margin-top:3px"><span>0€</span><span>150€</span><span>300€</span></div>
     </div>
 
     <div class="ls-sec">
       <div class="ls-lbl">📱 Autres (téléphone, abonnements…)</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:.85rem;color:var(--gray-500)">Estimation mensuelle :</span>
-        <input type="number" value="${S.misc}" min="0" max="500" step="5" id="misc-inp"
-          style="width:90px;padding:7px 11px;border:2px solid var(--gray-200);border-radius:8px;font-size:.9rem;font-weight:600;color:var(--gray-800)"
-          onchange="S.misc=parseInt(this.value)||0;updatePreview()">
-        <span style="font-size:.85rem;color:var(--gray-500)">€/mois</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:.85rem;color:var(--gray-5)">Estimation mensuelle :</span>
+        <input type="number" value="${S.misc}" min="0" max="500" step="5"
+          style="width:90px;padding:8px 12px;border:2px solid var(--gray-2);border-radius:var(--r);font-size:.9rem;font-weight:700;color:var(--gray-8);font-family:var(--font)"
+          onchange="S.misc=parseInt(this.value)||0;updPrev()">
+        <span style="font-size:.85rem;color:var(--gray-5)">€/mois</span>
       </div>
     </div>
 
-    <div class="ls-preview" id="preview">
-      <div style="font-size:.82rem;color:var(--blue-800);margin-bottom:3px">Budget de vie mensuel estimé</div>
-      <div style="font-size:2.25rem;font-weight:800;color:var(--blue-700)">${f(lv.monthly)}<span style="font-size:1rem;font-weight:400;color:#60a5fa">/mois</span></div>
-      <div style="font-size:.78rem;color:var(--gray-500);margin-top:3px">${f(lv.monthly*S.months)} sur ${S.months} mois/an · ${f(lv.monthly*S.months*S.duration)} sur ${S.duration} ans</div>
+    <div class="ls-prev" id="ls-prev">
+      <div style="font-size:.75rem;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Budget de vie mensuel estimé</div>
+      <div style="font-size:2rem;font-weight:800;color:var(--p);letter-spacing:-.04em">${f(lv.monthly)}<span style="font-size:.95rem;font-weight:500;color:var(--p2)">/mois</span></div>
+      <div style="font-size:.78rem;color:var(--gray-5);margin-top:3px">${f(lv.monthly*S.months)} sur ${S.months} mois/an · <strong style="color:var(--gray-7)">${f(lv.monthly*S.months*S.duration)}</strong> sur ${S.duration} an${S.duration>1?'s':''}</div>
     </div>
 
     <div class="nav">
-      <button class="btn-back" onclick="prev()">← Retour</button>
-      <button class="btn-next" onclick="showResults()">Voir mon budget →</button>
-    </div>`;
+      <button class="btn-bk" onclick="prv()">← Retour</button>
+      <button class="btn-nx" onclick="showResults()">Voir mon budget →</button>
+    </div>`
 }
 
-function updatePreview(){
-  const lv=calcLiving();
-  const el=document.getElementById('preview');
-  if(!el)return;
-  el.children[1].innerHTML=f(lv.monthly)+'<span style="font-size:1rem;font-weight:400;color:#60a5fa">/mois</span>';
-  el.children[2].textContent=f(lv.monthly*S.months)+' sur '+S.months+' mois/an · '+f(lv.monthly*S.months*S.duration)+' sur '+S.duration+' ans';
-  const s=document.getElementById('lslider');
-  if(s){const p=Math.min(100,Math.round(S.leisure/3));s.style.background=`linear-gradient(to right,var(--blue-600) ${p}%,var(--gray-200) ${p}%)`;}
+function updPrev(){
+  const lv=calcLv();const el=document.getElementById('ls-prev');if(!el)return;
+  el.children[1].innerHTML=f(lv.monthly)+'<span style="font-size:.95rem;font-weight:500;color:var(--p2)">/mois</span>';
+  el.children[2].textContent=f(lv.monthly*S.months)+' sur '+S.months+' mois/an · '+f(lv.monthly*S.months*S.duration)+' sur '+S.duration+' an'+(S.duration>1?'s':'');
 }
 
-// ═══════════════════════════════════════
+// ════════════════════════════════════
 // RESULTS
-// ═══════════════════════════════════════
+// ════════════════════════════════════
 function showResults(){
   document.getElementById('wizard').style.display='none';
   document.getElementById('results').style.display='block';
   const R=calcAll();
-  const pT=Math.round(R.totTuition/R.gross*100);
-  const pH=Math.round(R.totHousing/R.gross*100);
-  const pL=100-pT-pH;
-  const typeLabel=S.cursus==='post-prepa'?'PGE':S.cursus==='post-bac'?'Post-Bac':'Bachelor';
+  const pT=Math.round(R.tT/R.gross*100),pH=Math.round(R.tH/R.gross*100),pL=100-pT-pH;
+  const type=S.cursus==='post-prepa'?'PGE':S.cursus==='post-bac'?'Post-Bac':'Bachelor';
 
   document.getElementById('r-content').innerHTML=`
-    <div class="r-header">
-      <div class="r-school">${S.school.name}${S.cursus==='bachelor'?' · '+S.school.program:''}</div>
+    <div class="r-hero">
+      <div><span class="r-school-tag">🎓 ${S.school.name}${S.cursus==='bachelor'?' · '+S.school.program:''} · ${type}</span></div>
       <div class="r-title">Budget sur ${S.duration} an${S.duration>1?'s':''}</div>
-      <div class="r-sub">${S.school.city} · ${typeLabel} · ${S.months} mois/an pris en compte</div>
+      <div class="r-sub">${S.school.city} · ${S.months} mois pris en compte par an</div>
     </div>
 
-    <div class="grand-card">
-      <div class="gc-label">💰 Budget net à financer (famille + étudiant)</div>
-      <div class="gc-value">${f(R.net)}</div>
-      <div class="gc-sub">${R.totAlt>0?`Dont <strong>${f(R.totAlt)}</strong> de revenus alternance déduits · Brut : ${f(R.gross)}`:`Aucune alternance · Total brut = ${f(R.gross)}`}</div>
+    <div class="kpis">
+      <div class="kpi kpi-main">
+        <div class="kpi-lbl">💰 BUDGET NET TOTAL</div>
+        <div class="kpi-v">${f(R.net)}</div>
+        <div class="kpi-sub">${R.tA>0?`Alternance déduite (${f(R.tA)} de revenus)`:`Sans alternance · Brut ${f(R.gross)}`}</div>
+      </div>
+      <div class="kpi kpi-sec">
+        <div class="kpi-lbl">📅 BUDGET MENSUEL</div>
+        <div class="kpi-v">${f(R.lv.monthly)}</div>
+        <div class="kpi-sub">Logement + vie courante · ${f(R.lv.monthly*S.months)}/an</div>
+      </div>
+      <div class="kpi kpi-acc">
+        <div class="kpi-lbl">🎓 SCOLARITÉ SEULE</div>
+        <div class="kpi-v">${f(R.tT)}</div>
+        <div class="kpi-sub">${f(Math.round(R.tT/S.duration))}/an en moyenne sur ${S.duration} an${S.duration>1?'s':''}</div>
+      </div>
     </div>
+
+    ${R.tA>0?`<div class="savings-banner">
+      <div class="sb-icon">💼</div>
+      <div>
+        <div class="sb-lbl">Économies alternance</div>
+        <div class="sb-v">${f(R.tA+R.tT*(R.altYrs/S.duration))}</div>
+        <div class="sb-sub">${R.altYrs} an${R.altYrs>1?'s':''} de scolarité offert${R.altYrs>1?'s':''} + ${f(R.tA)} de revenus salariés</div>
+      </div>
+    </div>`:''}
 
     <div class="r-grid">
       <div class="r-card">
-        <div class="r-card-hdr"><div class="r-card-title">🎓 Investissement scolarité</div></div>
-        ${R.yrs.map(y=>`<div class="r-line">
-          <div class="r-l"><span class="yr-pill ${y.isAlt?'alt':''}">Année ${y.y}${y.isAlt?' · Alt.':''}</span></div>
-          <div class="r-v ${y.isAlt?'green':''}">${y.isAlt?'Gratuit (alternance)':f(y.tuition)}</div>
-        </div>`).join('')}
-        ${R.totAlt>0?`<div class="r-line" style="margin-top:6px;background:var(--green-50);border-radius:6px;padding:5px 7px">
-          <div class="r-l txt-green">✓ Revenus alternance totaux</div>
-          <div class="r-v green">+${f(R.totAlt)}</div>
-        </div>`:''}
-        <div class="r-line tot">
-          <div class="r-l">Scolarité nette</div>
-          <div class="r-v blue">${f(R.totTuition-R.totAlt)}</div>
+        <div class="r-card-hdr">
+          <div class="r-card-icon ri-blue">🎓</div>
+          <div><div class="r-card-title">Scolarité</div><div class="r-card-sub">Frais par année</div></div>
         </div>
+        ${R.yrs.map(y=>`<div class="rl">
+          <div class="rl-l"><span class="yr-pill ${y.isA?'alt':''}">An ${y.y}${y.isA?' · Alt.':''}</span></div>
+          <div class="rl-v ${y.isA?'g':''}">${y.isA?'Gratuit':f(y.tuition)}</div>
+        </div>`).join('')}
+        ${R.tA>0?`<div class="rl" style="margin-top:6px;background:var(--green-light);border-radius:8px;padding:5px 8px">
+          <div class="rl-l" style="color:var(--green);font-weight:600">Revenus alternance</div>
+          <div class="rl-v g">+${f(R.tA)}</div>
+        </div>`:''}
+        <div class="rl tot"><div class="rl-l">Scolarité nette</div><div class="rl-v p">${f(R.tT-R.tA)}</div></div>
       </div>
 
       <div class="r-card">
-        <div class="r-card-hdr"><div class="r-card-title">🏠 Budget vie quotidienne</div></div>
-        <div class="m-toggle">
-          <button class="m-btn ${S.months===10?'act':''}" onclick="setMonths(10)">10 mois/an</button>
-          <button class="m-btn ${S.months===12?'act':''}" onclick="setMonths(12)">12 mois/an</button>
+        <div class="r-card-hdr">
+          <div class="r-card-icon ri-cyan">🏠</div>
+          <div>
+            <div class="r-card-title">Vie quotidienne</div>
+            <div class="r-card-sub" style="display:flex;align-items:center;gap:6px;margin-top:4px">
+              <div class="m-toggle" style="margin:0">
+                <button class="m-btn ${S.months===10?'act':''}" onclick="setMonths(10)">10 mois</button>
+                <button class="m-btn ${S.months===12?'act':''}" onclick="setMonths(12)">12 mois</button>
+              </div>
+            </div>
+          </div>
         </div>
-        ${R.lv.rent>0?`<div class="r-line"><div class="r-l">🏢 Loyer brut</div><div class="r-v">${f(R.lv.rent)}/mois</div></div>`:'<div class="r-line"><div class="r-l">🏠 Logement</div><div class="r-v green">0€ (chez parents)</div></div>'}
-        ${R.lv.apl>0?`<div class="r-line"><div class="r-l txt-green">🏛️ APL (déduction CAF)</div><div class="r-v green">−${f(R.lv.apl)}/mois</div></div>
-          <div class="r-line"><div class="r-l">🏢 Loyer net</div><div class="r-v">${f(R.lv.netRent)}/mois</div></div>`:''}
-        <div class="r-line"><div class="r-l">🍔 Alimentation</div><div class="r-v">${f(R.lv.food)}/mois</div></div>
-        <div class="r-line"><div class="r-l">🚌 Transport</div><div class="r-v">${f(R.lv.tc)}/mois</div></div>
-        <div class="r-line"><div class="r-l">🎉 Loisirs</div><div class="r-v">${f(R.lv.leisure)}/mois</div></div>
-        <div class="r-line"><div class="r-l">📱 Autres</div><div class="r-v">${f(R.lv.misc)}/mois</div></div>
-        <div class="r-line tot"><div class="r-l">Mensuel total</div><div class="r-v blue">${f(R.lv.monthly)}/mois</div></div>
-        <div class="r-line tot" style="border-top:none;padding-top:3px"><div class="r-l">Budget vie (${S.duration} ans)</div><div class="r-v">${f(R.totHousing+R.totLiving)}</div></div>
-        ${R.aplTotal>0?`<div class="r-line" style="font-size:.8rem"><div class="r-l txt-green">dont APL sur le cursus</div><div class="r-v green">−${f(R.aplTotal)}</div></div>`:''}
+        ${R.lv.rent>0?`<div class="rl"><div class="rl-l">🏢 Loyer brut</div><div class="rl-v">${f(R.lv.rent)}/mois</div></div>`
+          :`<div class="rl"><div class="rl-l">🏠 Logement</div><div class="rl-v g">0€ (chez parents)</div></div>`}
+        ${R.lv.apl>0?`<div class="rl"><div class="rl-l" style="color:var(--green)">🏛️ APL CAF</div><div class="rl-v g">−${f(R.lv.apl)}/mois</div></div>
+          <div class="rl"><div class="rl-l">🏢 Loyer net</div><div class="rl-v">${f(R.lv.netRent)}/mois</div></div>`:''}
+        <div class="rl"><div class="rl-l">🍔 Alimentation</div><div class="rl-v">${f(R.lv.food)}/mois</div></div>
+        <div class="rl"><div class="rl-l">🚌 Transport</div><div class="rl-v">${f(R.lv.tc)}/mois</div></div>
+        <div class="rl"><div class="rl-l">🎉 Loisirs</div><div class="rl-v">${f(R.lv.leisure)}/mois</div></div>
+        <div class="rl"><div class="rl-l">📱 Autres</div><div class="rl-v">${f(R.lv.misc)}/mois</div></div>
+        <div class="rl tot"><div class="rl-l">Mensuel total</div><div class="rl-v p">${f(R.lv.monthly)}/mois</div></div>
+        <div class="rl tot" style="border-top:none;padding-top:2px"><div class="rl-l">Vie sur ${S.duration} an${S.duration>1?'s':''}</div><div class="rl-v">${f(R.tH+R.tL)}</div></div>
+        ${R.aplTotal>0?`<div class="rl" style="font-size:.78rem"><div class="rl-l g">dont APL sur le cursus</div><div class="rl-v g">−${f(R.aplTotal)}</div></div>`:''}
       </div>
     </div>
 
     <div class="chart-card">
-      <div class="chart-title">Répartition du budget par année</div>
-      <canvas id="bgchart" height="200"></canvas>
-      <div class="leg">
-        <div class="leg-item"><div class="leg-dot" style="background:var(--blue-600)"></div>Scolarité</div>
-        <div class="leg-item"><div class="leg-dot" style="background:var(--amber-500)"></div>Logement</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#10b981"></div>Vie courante</div>
-        ${R.totAlt>0?'<div class="leg-item"><div class="leg-dot" style="background:#ef4444"></div>Revenus alternance (déduits)</div>':''}
+      <div class="chart-hdr">
+        <div class="chart-title">Répartition par année</div>
+        <div class="leg">
+          <div class="leg-i"><div class="leg-d" style="background:var(--p)"></div>Scolarité</div>
+          <div class="leg-i"><div class="leg-d" style="background:var(--amber)"></div>Logement</div>
+          <div class="leg-i"><div class="leg-d" style="background:var(--cyan)"></div>Vie courante</div>
+          ${R.tA>0?'<div class="leg-i"><div class="leg-d" style="background:#f87171"></div>Revenus alt.</div>':''}
+        </div>
       </div>
+      <canvas id="bgc" height="190"></canvas>
     </div>
 
-    <div class="r-card" style="margin-bottom:1.1rem">
-      <div class="r-card-hdr"><div class="r-card-title">📊 Répartition globale (brut)</div></div>
-      <div class="r-line"><div class="r-l">🎓 Scolarité</div><div class="r-v">${f(R.totTuition)} <span style="color:var(--gray-400);font-weight:400">(${pT}%)</span></div></div>
+    <div class="r-card" style="margin-bottom:1rem">
+      <div class="r-card-hdr">
+        <div class="r-card-icon ri-green">📊</div>
+        <div><div class="r-card-title">Répartition globale des dépenses</div></div>
+      </div>
+      <div class="rl"><div class="rl-l">🎓 Scolarité</div><div class="rl-v">${f(R.tT)} <span style="color:var(--gray-4);font-weight:500">(${pT}%)</span></div></div>
       <div class="bbar"><div class="bs bs-t" style="width:${pT}%"></div></div>
-      <div class="r-line"><div class="r-l">🏠 Logement</div><div class="r-v">${f(R.totHousing)} <span style="color:var(--gray-400);font-weight:400">(${pH}%)</span></div></div>
+      <div class="rl"><div class="rl-l">🏠 Logement</div><div class="rl-v">${f(R.tH)} <span style="color:var(--gray-4);font-weight:500">(${pH}%)</span></div></div>
       <div class="bbar"><div class="bs bs-h" style="width:${pH}%"></div></div>
-      <div class="r-line"><div class="r-l">🛒 Vie courante</div><div class="r-v">${f(R.totLiving)} <span style="color:var(--gray-400);font-weight:400">(${pL}%)</span></div></div>
+      <div class="rl"><div class="rl-l">🛒 Vie courante</div><div class="rl-v">${f(R.tL)} <span style="color:var(--gray-4);font-weight:500">(${pL}%)</span></div></div>
       <div class="bbar"><div class="bs bs-l" style="width:${pL}%"></div></div>
-      ${R.totAlt>0?`<div class="r-line" style="margin-top:4px"><div class="r-l txt-green">💼 Revenus alternance</div><div class="r-v green">−${f(R.totAlt)}</div></div>`:''}
-      <div class="r-line tot"><div class="r-l">Budget net total</div><div class="r-v blue" style="font-size:1.15rem">${f(R.net)}</div></div>
+      ${R.tA>0?`<div class="rl" style="margin-top:4px"><div class="rl-l g">💼 Revenus alternance déduits</div><div class="rl-v g">−${f(R.tA)}</div></div>`:''}
+      <div class="rl tot"><div class="rl-l">Budget net total</div><div class="rl-v p" style="font-size:1.2rem">${f(R.net)}</div></div>
     </div>
 
-    <div class="notice-blue" style="margin-bottom:1.1rem">
-      ℹ️ Ces estimations sont indicatives et basées sur des moyennes. Les frais réels peuvent varier selon les années, la situation familiale, et les aides disponibles.
-    </div>
-
-    <button class="restart" onclick="restart()">🔄 Recommencer une simulation</button>
+    <div class="notice nb"><span class="notice-icon">ℹ️</span>Estimations indicatives basées sur des moyennes. Les frais réels peuvent varier selon votre situation personnelle et les aides disponibles.</div>
+    <button class="restart" onclick="restart()">↺ Recommencer une simulation</button>
   `;
 
   setTimeout(()=>{
-    const ctx=document.getElementById('bgchart');
-    if(!ctx)return;
-    new Chart(ctx,{
-      type:'bar',
-      data:{
-        labels:R.yrs.map(y=>`An ${y.y}${y.isAlt?' (alt.)':''}`),
-        datasets:[
-          {label:'Scolarité',data:R.yrs.map(y=>y.tuition),backgroundColor:'#3b82f6',stack:'c',borderRadius:4},
-          {label:'Logement',data:R.yrs.map(y=>y.housing),backgroundColor:'#f59e0b',stack:'c',borderRadius:4},
-          {label:'Vie courante',data:R.yrs.map(y=>y.living),backgroundColor:'#10b981',stack:'c',borderRadius:4},
-          ...(R.totAlt>0?[{label:'Revenus alternance',data:R.yrs.map(y=>y.income>0?-y.income:0),backgroundColor:'rgba(239,68,68,.75)',stack:'r',borderRadius:4}]:[]),
-        ]
-      },
-      options:{
-        responsive:true,
-        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${f(Math.abs(ctx.parsed.y))}`}}},
-        scales:{
-          x:{stacked:true,grid:{display:false}},
-          y:{stacked:true,ticks:{callback:v=>v<0?`-${Math.abs(v)/1000}k€`:`${v/1000}k€`},grid:{color:'rgba(0,0,0,.05)'}}
-        }
+    const ctx=document.getElementById('bgc');if(!ctx)return;
+    new Chart(ctx,{type:'bar',data:{
+      labels:R.yrs.map(y=>`An ${y.y}${y.isA?' (alt.)':''}`),
+      datasets:[
+        {label:'Scolarité',data:R.yrs.map(y=>y.tuition),backgroundColor:'rgba(79,70,229,.85)',stack:'c',borderRadius:5},
+        {label:'Logement',data:R.yrs.map(y=>y.housing),backgroundColor:'rgba(217,119,6,.8)',stack:'c',borderRadius:5},
+        {label:'Vie courante',data:R.yrs.map(y=>y.living),backgroundColor:'rgba(6,182,212,.8)',stack:'c',borderRadius:5},
+        ...(R.tA>0?[{label:'Revenus',data:R.yrs.map(y=>y.inc>0?-y.inc:0),backgroundColor:'rgba(248,113,113,.75)',stack:'r',borderRadius:5}]:[]),
+      ]
+    },options:{
+      responsive:true,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${f(Math.abs(c.parsed.y))}`}}},
+      scales:{
+        x:{stacked:true,grid:{display:false},ticks:{font:{family:'Plus Jakarta Sans',weight:'600',size:12}}},
+        y:{stacked:true,grid:{color:'rgba(0,0,0,.04)'},ticks:{callback:v=>v<0?`-${Math.abs(v/1000)}k€`:`${v/1000}k€`,font:{family:'Plus Jakarta Sans',size:11}}}
       }
-    });
+    }});
   },150);
 }
 
-// ═══════════════════════════════════════
-// EVENT HANDLERS
-// ═══════════════════════════════════════
+// ════════════════════════════════════
+// HANDLERS
+// ════════════════════════════════════
 function setCursus(v){S.cursus=v;S.school=null;S.duration=v==='post-bac'?5:3;render()}
 function setSchool(i){S.school=i===''?null:SCHOOLS[S.cursus][parseInt(i)];if(S.cursus==='bachelor'&&S.school)S.duration=S.school.duration;render()}
 function setDur(d){S.duration=d;render()}
@@ -733,9 +820,9 @@ function toggleApl(){S.apl=!S.apl;render()}
 function setFood(v){S.food=v;render()}
 function setTransport(v){S.transport=v;render()}
 function setMonths(n){S.months=n;showResults()}
-function next(){if(S.step<6){S.step++;render()}}
-function prev(){if(S.step>1){S.step--;render()}}
-function backToLanding(){document.getElementById('wizard').style.display='none';document.getElementById('landing').style.display='flex'}
+function nxt(){if(S.step<6){S.step++;render()}}
+function prv(){if(S.step>1){S.step--;render()}}
+function backHome(){document.getElementById('wizard').style.display='none';document.getElementById('landing').style.display='flex'}
 function restart(){document.getElementById('results').style.display='none';document.getElementById('landing').style.display='flex'}
 function startWizard(){
   document.getElementById('landing').style.display='none';
