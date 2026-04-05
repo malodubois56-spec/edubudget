@@ -13,7 +13,6 @@ if(sessionStorage.getItem('eb-auth') !== PASS){
   const input = prompt('Mot de passe :');
   if(input !== PASS){ document.body.innerHTML = '<p style="font-family:sans-serif;padding:2rem">Accès refusé.</p>'; throw new Error('auth'); }
   sessionStorage.setItem('eb-auth', PASS);
-}
 // ── CONFIG ──────────────────────────────
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f1f5f9;--card:#fff;--border:#e2e8f0;--txt:#0f172a;--txt2:#475569;--txt3:#94a3b8;--blue:#1a56db;--blue-bg:#eef3ff;--blue-bdr:#c7d8fe;--gn:#16a34a;--gnl:#f0fdf4;--gnm:#bbf7d0;--rd:#dc2626;--rdl:#fef2f2;--rdm:#fca5a5;--am:#d97706;--aml:#fffbeb;--font:'Plus Jakarta Sans',system-ui,sans-serif;--r:8px;--rl:12px}
