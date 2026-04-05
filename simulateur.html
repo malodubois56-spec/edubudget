@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduBudget — Simulateur de budget Grandes Écoles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --p:#4f46e5;--p2:#6366f1;--p3:#818cf8;--pl:#eef2ff;--pm:#c7d2fe;
+  --cy:#06b6d4;--cyl:#ecfeff;--cym:#a5f3fc;
+  --gn:#16a34a;--gnl:#f0fdf4;--gnm:#bbf7d0;
+  --am:#d97706;--aml:#fffbeb;--amm:#fde68a;
+  --rd:#dc2626;--rdl:#fef2f2;
+  --bg:#fafbff;--bg1:#f1f5f9;--bg2:#e2e8f0;
+  --card:#fff;--border:#e2e8f0;
+  --txt:#0f172a;--txt2:#475569;--txt3:#94a3b8;
+  --sh:0 1px 3px rgba(0,0,0,.07);--sh-md:0 4px 14px rgba(0,0,0,.08);--sh-lg:0 12px 32px rgba(0,0,0,.1);
+  --r:10px;--rl:16px;--rxl:20px;
+  --font:'Plus Jakarta Sans',system-ui,sans-serif;
+}
+body.dark{
+  --bg:#0f172a;--bg1:#1e293b;--bg2:#334155;
+  --card:#1a2744;--border:#334155;
+  --txt:#f1f5f9;--txt2:#94a3b8;--txt3:#64748b;
+  --sh:0 1px 3px rgba(0,0,0,.3);--sh-md:0 4px 14px rgba(0,0,0,.3);
+}
+body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1.6;min-height:100vh;transition:background .2s,color .2s}
+
+/* VIEWS */
+.view{display:none}.view.active{display:block}
+#vl{display:flex;flex-direction:column;min-height:100vh}
+
+/* LANDING */
+.l-nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;position:absolute;top:0;left:0;right:0;z-index:10}
+.l-logo{font-size:1.05rem;font-weight:800;color:#fff;letter-spacing:-.02em;display:flex;align-items:center;gap:7px}
+.ldot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#a5f3fc,#818cf8)}
+.l-nav-r{display:flex;align-items:center;gap:8px}
+.l-hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:7rem 2rem 4rem;background:linear-gradient(150deg,#1e1b4b 0%,#312e81 35%,#1e3a8a 65%,#0c4a6e 100%);position:relative;overflow:hidden}
+.l-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(129,140,248,.2),transparent),radial-gradient(ellipse 50% 40% at 80% 100%,rgba(6,182,212,.15),transparent);pointer-events:none}
+.l-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:50px;padding:6px 16px;font-size:12px;font-weight:600;color:#c7d2fe;margin-bottom:1.75rem;letter-spacing:.02em;position:relative;z-index:1}
+.bdot{width:6px;height:6px;border-radius:50%;background:#4ade80}
+.l-hero h1{font-size:clamp(1.85rem,5vw,3.25rem);font-weight:800;line-height:1.1;letter-spacing:-.035em;color:#fff;max-width:720px;margin-bottom:1.2rem;position:relative;z-index:1}
+.l-hero h1 em{font-style:normal;background:linear-gradient(135deg,#a5f3fc,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.l-hero p{font-size:1rem;color:rgba(255,255,255,.75);max-width:520px;margin-bottom:2rem;line-height:1.75;position:relative;z-index:1}
+
+/* saved simulation banner */
+.saved-band{display:none;align-items:center;gap:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:var(--rl);padding:.75rem 1.1rem;max-width:540px;width:100%;margin-bottom:.875rem;position:relative;z-index:1}
+.saved-band.show{display:flex}
+.saved-band-txt{font-size:.82rem;color:rgba(255,255,255,.9);font-weight:600;flex:1;text-align:left}
+.saved-band-btn{padding:6px 14px;border-radius:50px;border:none;background:#fff;color:var(--p);font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap}
+
+.l-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:540px;width:100%;position:relative;z-index:1}
+@media(max-width:480px){.l-actions{grid-template-columns:1fr}}
+.la{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:.875rem 1.1rem;border-radius:var(--rl);border:none;cursor:pointer;font-family:var(--font);transition:all .2s;text-align:left}
+.la.main{background:#fff;grid-column:span 2}
+@media(max-width:480px){.la.main{grid-column:span 1}}
+.la.main:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,255,255,.2)}
+.la.sec{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff}
+.la.sec:hover{background:rgba(255,255,255,.17)}
+.la-ic{font-size:1.15rem;margin-bottom:2px}
+.la-t{font-size:.9rem;font-weight:700}
+.la.main .la-t{color:var(--p)}
+.la-s{font-size:.73rem;opacity:.65;font-weight:500}
+.la.main .la-s{color:var(--txt2)}
+
+.l-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:1.75rem;position:relative;z-index:1}
+.chip{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:50px;padding:5px 12px;font-size:.74rem;color:rgba(255,255,255,.7);font-weight:500}
+
+.l-feats{background:var(--card);padding:3.5rem 2rem;transition:background .2s}
+.l-feat-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:1.1rem;max-width:900px;margin:0 auto}
+.lf{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);padding:1.35rem;transition:all .2s}
+.lf:hover{border-color:var(--pm);transform:translateY(-2px);box-shadow:var(--sh-md)}
+.lf-ic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:.8rem}
+.fi-p{background:var(--pl)}.fi-c{background:var(--cyl)}.fi-g{background:var(--gnl)}.fi-a{background:var(--aml)}
+.lf h3{font-size:.88rem;font-weight:700;color:var(--txt);margin-bottom:.25rem}
+.lf p{font-size:.78rem;color:var(--txt2);line-height:1.6}
+.l-foot{text-align:center;padding:1.1rem;font-size:.73rem;color:var(--txt3);border-top:1px solid var(--border);background:var(--card);transition:background .2s}
+
+/* APP BAR */
+.abar{background:var(--card);border-bottom:1px solid var(--border);padding:0 1.5rem;height:56px;display:flex;align-items:center;gap:.875rem;position:sticky;top:0;z-index:50;box-shadow:var(--sh);transition:background .2s,border-color .2s}
+.alogo{font-size:.97rem;font-weight:800;color:var(--p);letter-spacing:-.02em;display:flex;align-items:center;gap:6px;cursor:pointer}
+.aldot{width:7px;height:7px;border-radius:50%;background:linear-gradient(135deg,var(--cy),var(--p))}
+.adots{display:flex;align-items:center;gap:4px;flex:1;justify-content:center}
+.ad{width:7px;height:7px;border-radius:50%;background:var(--bg2);transition:all .3s}
+.ad.done{background:var(--p)}
+.ad.cur{width:22px;border-radius:4px;background:linear-gradient(90deg,var(--p),var(--cy))}
+.albl{font-size:12px;color:var(--txt3);font-weight:600;white-space:nowrap}
+.dm-tog{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:var(--bg1);color:var(--txt2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.92rem;transition:all .18s;flex-shrink:0}
+.dm-tog:hover{background:var(--bg2);color:var(--txt)}
+.nav-dm{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.92rem}
+
+/* WIZARD */
+.w-wrap{max-width:640px;margin:0 auto;padding:2rem 1rem 5rem}
+.sc{background:var(--card);border-radius:var(--rxl);padding:1.875rem;border:1px solid var(--border);box-shadow:var(--sh);animation:su .22s cubic-bezier(.16,1,.3,1);transition:background .2s,border-color .2s}
+@keyframes su{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.ebrow{display:flex;align-items:center;gap:8px;margin-bottom:.45rem}
+.sbadge{background:linear-gradient(135deg,var(--p),var(--cy));color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:50px;letter-spacing:.04em;text-transform:uppercase}
+.stit{font-size:1.18rem;font-weight:800;color:var(--txt);margin-bottom:.3rem;letter-spacing:-.02em}
+.ssub{font-size:.82rem;color:var(--txt2);margin-bottom:1.4rem;line-height:1.65}
+
+.og{display:grid;gap:9px}
+.og2{grid-template-columns:1fr 1fr}
+.og3{grid-template-columns:1fr}
+@media(min-width:460px){.og3{grid-template-columns:repeat(3,1fr)}}
+.oc{border:2px solid var(--border);border-radius:var(--rl);padding:1.1rem .875rem;text-align:center;cursor:pointer;transition:all .18s;background:var(--card);position:relative;overflow:hidden}
+.oc:hover{border-color:var(--pm);transform:translateY(-1px);box-shadow:var(--sh-md)}
+.oc.sel{border-color:var(--p);background:var(--pl);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.oc.sel-g{border-color:var(--gn);background:var(--gnl);box-shadow:0 0 0 3px rgba(22,163,74,.08)}
+.oc-chk{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:var(--p);display:none;align-items:center;justify-content:center;font-size:9px;color:#fff}
+.oc.sel .oc-chk{display:flex}.oc.sel-g .oc-chk{display:flex;background:var(--gn)}
+.oc-i{font-size:1.7rem;margin-bottom:.5rem;display:block;transition:transform .18s}
+.oc:hover .oc-i{transform:scale(1.07)}
+.oc-n{font-weight:700;font-size:.86rem;color:var(--txt)}
+.oc-d{font-size:.73rem;color:var(--txt2);margin-top:3px;line-height:1.5}
+.oc-p{font-size:.76rem;font-weight:700;color:var(--p);margin-top:5px}
+.oc-p-g{color:var(--gn)}
+
+.sw{position:relative}
+.ssel{width:100%;padding:11px 36px 11px 13px;border:2px solid var(--border);border-radius:var(--rl);font-size:.9rem;color:var(--txt);background:var(--card);cursor:pointer;appearance:none;font-family:var(--font);font-weight:500;transition:border-color .18s}
+.ssel:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.sarr{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--txt3);font-size:.78rem}
+.sinf{background:linear-gradient(135deg,var(--pl),var(--cyl));border:1px solid var(--pm);border-radius:var(--rl);padding:.95rem;margin-top:.75rem;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.si-l{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--txt3);font-weight:700;margin-bottom:2px}
+.si-v{font-size:.95rem;font-weight:800;color:var(--p);letter-spacing:-.02em}
+.si-s{font-size:.75rem;color:var(--txt2)}
+
+.rng{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--bg2);outline:none}
+.rng::-webkit-slider-thumb{-webkit-appearance:none;width:21px;height:21px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--cy));cursor:pointer;box-shadow:0 2px 8px rgba(79,70,229,.35)}
+.dv{text-align:center;font-size:2.6rem;font-weight:800;color:var(--p);line-height:1;margin:.6rem 0;letter-spacing:-.04em}
+.dbs{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+.db{padding:6px 15px;border:2px solid var(--border);border-radius:50px;background:var(--card);font-size:.82rem;font-weight:700;cursor:pointer;color:var(--txt2);transition:all .18s;font-family:var(--font)}
+.db:hover:not(:disabled){border-color:var(--p);color:var(--p)}
+.db.act{border-color:var(--p);background:var(--p);color:#fff}
+.db:disabled{opacity:.25;cursor:not-allowed}
+
+.ntc{border-radius:var(--rl);padding:.8rem .95rem;font-size:.8rem;margin-top:.75rem;display:flex;align-items:flex-start;gap:8px;font-weight:500;line-height:1.55}
+.nb{background:var(--pl);border:1px solid var(--pm);color:var(--p)}
+.no{background:var(--aml);border:1px solid var(--amm);color:#92400e}
+.ng{background:var(--gnl);border:1px solid var(--gnm);color:#166534}
+
+.apl-b{margin-top:.75rem;background:var(--gnl);border:1.5px solid var(--gnm);border-radius:var(--rl);padding:.8rem .95rem;display:flex;align-items:flex-start;gap:9px}
+.trow{display:flex;align-items:center;gap:9px;cursor:pointer;font-weight:700;font-size:.84rem;color:#166534}
+.tog{width:40px;height:22px;background:var(--bg2);border-radius:11px;position:relative;cursor:pointer;transition:background .18s;flex-shrink:0}
+.tog.on{background:var(--gn)}
+.togk{position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .18s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.tog.on .togk{left:21px}
+
+.tier{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:2px 9px;border-radius:50px}
+.t1{background:#fef3c7;color:#78350f}.t2{background:var(--pl);color:#3730a3}.t3{background:var(--gnl);color:#14532d}
+
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1.1rem;border-top:1px solid var(--border)}
+.bbk{padding:9px 20px;border:2px solid var(--border);border-radius:50px;background:var(--card);font-size:.84rem;font-weight:700;cursor:pointer;color:var(--txt2);transition:all .18s;font-family:var(--font)}
+.bbk:hover{border-color:var(--bg2);background:var(--bg1)}
+.bnx{padding:11px 26px;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;border-radius:50px;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;font-family:var(--font);box-shadow:0 4px 14px rgba(79,70,229,.3)}
+.bnx:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,70,229,.4)}
+.bnx:disabled{background:var(--bg2);box-shadow:none;cursor:not-allowed;transform:none;color:var(--txt3)}
+
+.ls-s{margin-bottom:1.1rem}
+.ls-l{font-weight:700;font-size:.82rem;color:var(--txt2);margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between;gap:7px}
+.ls-prev{background:linear-gradient(135deg,var(--pl),var(--cyl));border:1.5px solid var(--pm);border-radius:var(--rl);padding:.95rem 1.1rem;margin-top:.75rem;text-align:center}
+
+/* RESULTS */
+.rw{max-width:900px;margin:0 auto;padding:2rem 1rem 5rem}
+.r-hero{text-align:center;margin-bottom:1.75rem}
+.rstag{display:inline-flex;align-items:center;gap:6px;background:var(--pl);border:1px solid var(--pm);border-radius:50px;padding:4px 13px;font-size:.76rem;font-weight:700;color:var(--p);margin-bottom:.6rem}
+.rtit{font-size:1.8rem;font-weight:800;color:var(--txt);letter-spacing:-.035em;margin-bottom:.25rem}
+.rsub{font-size:.8rem;color:var(--txt3)}
+
+.kpis{display:grid;grid-template-columns:1fr;gap:.875rem;margin-bottom:1.1rem}
+@media(min-width:500px){.kpis{grid-template-columns:repeat(3,1fr)}}
+.kpi{border-radius:var(--rxl);padding:1.35rem;position:relative;overflow:hidden}
+.km{background:linear-gradient(135deg,var(--p),#7c3aed);color:#fff}
+.ks{background:linear-gradient(135deg,#0891b2,var(--cy));color:#fff}
+.ka{background:var(--gnl);border:1.5px solid var(--gnm)}
+.kl{font-size:.7rem;font-weight:700;opacity:.8;margin-bottom:.4rem;letter-spacing:.04em;text-transform:uppercase}
+.kv{font-size:1.65rem;font-weight:800;letter-spacing:-.04em;line-height:1}
+.km .kv,.ks .kv{color:#fff}.ka .kv{color:var(--gn)}
+.ksub{font-size:.7rem;margin-top:.35rem;opacity:.7}
+.km .ksub,.ks .ksub{color:#fff}.ka .ksub{color:var(--gn)}
+
+.tabs{display:flex;gap:3px;background:var(--bg1);border-radius:50px;padding:3px;margin-bottom:1.1rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{flex:1;padding:7px 13px;border:none;border-radius:50px;font-size:.77rem;font-weight:700;cursor:pointer;background:transparent;color:var(--txt3);transition:all .18s;font-family:var(--font);white-space:nowrap}
+.tab.act{background:var(--card);color:var(--p);box-shadow:var(--sh)}
+.tpane{display:none}.tpane.act{display:block;animation:su .2s ease}
+
+.rg{display:grid;grid-template-columns:1fr;gap:.875rem;margin-bottom:.875rem}
+@media(min-width:560px){.rg{grid-template-columns:1fr 1fr}}
+.rc{background:var(--card);border-radius:var(--rxl);padding:1.3rem;border:1px solid var(--border);box-shadow:var(--sh);transition:background .2s}
+.rch{display:flex;align-items:center;gap:8px;margin-bottom:.8rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)}
+.rci{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.ri-p{background:var(--pl)}.ri-c{background:var(--cyl)}.ri-g{background:var(--gnl)}
+.rct{font-weight:700;font-size:.88rem;color:var(--txt)}
+.rcs{font-size:.72rem;color:var(--txt3);margin-top:1px}
+
+.rl{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:.82rem}
+.rl:last-child{border-bottom:none}
+.rll{color:var(--txt2)}.rlv{font-weight:700;color:var(--txt)}
+.rlv.g{color:var(--gn)}.rlv.p{color:var(--p)}.rlv.r{color:var(--rd)}
+.rl.tot{border-top:2px solid var(--border);padding-top:8px;margin-top:4px;border-bottom:none}
+.rl.tot .rll{color:var(--txt);font-weight:700;font-size:.86rem}
+.rl.tot .rlv{font-size:1rem}
+
+.mt{display:flex;background:var(--bg1);border-radius:50px;padding:3px;width:fit-content;margin-bottom:.75rem}
+.mb{padding:5px 12px;border:none;border-radius:50px;font-size:.75rem;font-weight:700;cursor:pointer;background:transparent;color:var(--txt3);transition:all .18s;font-family:var(--font)}
+.mb.act{background:var(--card);color:var(--p);box-shadow:var(--sh)}
+
+.cc{background:var(--card);border-radius:var(--rxl);padding:1.3rem;border:1px solid var(--border);box-shadow:var(--sh);margin-bottom:.875rem;transition:background .2s}
+.cch{display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem;flex-wrap:wrap;gap:7px}
+.cct{font-weight:700;font-size:.88rem;color:var(--txt)}
+.leg{display:flex;gap:10px;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:5px;font-size:.73rem;color:var(--txt3);font-weight:500}
+.ld{width:8px;height:8px;border-radius:2px}
+
+.bbar{height:7px;background:var(--bg1);border-radius:4px;overflow:hidden;margin:4px 0 8px;display:flex}
+.bs{height:100%}.bs-t{background:var(--p)}.bs-h{background:var(--am)}.bs-l{background:var(--cy)}
+
+.yp{display:inline-flex;align-items:center;gap:2px;background:var(--pl);color:var(--p);font-size:11px;font-weight:700;padding:2px 8px;border-radius:50px;border:1px solid var(--pm)}
+.yp.alt{background:var(--gnl);color:var(--gn);border-color:var(--gnm)}
+
+.sbanner{background:linear-gradient(135deg,var(--gnl),#dcfce7);border:1.5px solid var(--gnm);border-radius:var(--rxl);padding:1.2rem;margin-bottom:.875rem;display:flex;align-items:center;gap:.875rem}
+.sbico{width:42px;height:42px;background:var(--gn);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.sbv{font-size:1.55rem;font-weight:800;color:var(--gn);letter-spacing:-.04em;line-height:1;margin-bottom:2px}
+.sbl{font-size:.7rem;font-weight:700;color:var(--gn);text-transform:uppercase;letter-spacing:.05em}
+.sbs{font-size:.75rem;color:#166534}
+
+/* Savings calc */
+.savc{background:var(--card);border-radius:var(--rxl);padding:1.3rem;border:1px solid var(--border);box-shadow:var(--sh);transition:background .2s}
+.savr{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border-radius:var(--rl);padding:1.2rem;text-align:center;margin-top:.875rem}
+.savr-v{font-size:2.1rem;font-weight:800;letter-spacing:-.04em;line-height:1}
+.savr-s{font-size:.77rem;opacity:.75;margin-top:.3rem}
+
+/* CROUS */
+.crous-r{background:var(--gnl);border:1.5px solid var(--gnm);border-radius:var(--rl);padding:1.1rem;text-align:center;margin-top:.875rem}
+.crous-v{font-size:1.75rem;font-weight:800;color:var(--gn);letter-spacing:-.04em}
+.crous-e{display:inline-flex;align-items:center;gap:6px;border-radius:50px;padding:5px 14px;font-size:.82rem;font-weight:700;margin:.75rem 0}
+.crous-none{background:var(--rdl);border:1px solid #fca5a5;border-radius:var(--rl);padding:.875rem;text-align:center;color:var(--rd);font-weight:600;font-size:.85rem}
+
+/* Share */
+.share-row{display:flex;gap:8px;align-items:center;margin-top:.875rem}
+.share-i{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--rl);font-size:.8rem;background:var(--bg1);color:var(--txt);font-family:var(--font)}
+.share-b{padding:9px 16px;border-radius:var(--rl);border:none;background:var(--p);color:#fff;font-size:.8rem;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;transition:all .18s}
+.share-b:hover{background:var(--p2)}
+
+/* action buttons */
+.racts{display:flex;gap:8px;flex-wrap:wrap;margin:1rem 0}
+.ract{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:50px;border:1.5px solid var(--border);background:var(--card);color:var(--txt2);font-size:.8rem;font-weight:700;cursor:pointer;transition:all .18s;font-family:var(--font)}
+.ract:hover{border-color:var(--pm);color:var(--p);background:var(--pl)}
+.ract.print-btn:hover{border-color:var(--amm);color:var(--am);background:var(--aml)}
+
+.restrt{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:11px;background:var(--card);border:2px solid var(--border);border-radius:var(--rl);font-size:.88rem;font-weight:700;color:var(--txt2);cursor:pointer;transition:all .2s;margin-top:.875rem;font-family:var(--font)}
+.restrt:hover{border-color:var(--pm);color:var(--p);background:var(--pl)}
+
+/* PAGE WRAP */
+.pw{max-width:940px;margin:0 auto;padding:2rem 1rem 5rem}
+.pt{font-size:1.45rem;font-weight:800;color:var(--txt);letter-spacing:-.03em;margin-bottom:.35rem}
+.ps{font-size:.84rem;color:var(--txt2);margin-bottom:1.5rem}
+
+/* COMPARE */
+.cmp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:1.25rem}
+.cmp-slot{background:var(--card);border:2px dashed var(--border);border-radius:var(--rl);padding:1.2rem;text-align:center;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;transition:all .2s}
+.cmp-slot.filled{border-style:solid;border-color:var(--pm);background:var(--pl)}
+.cmp-sn{font-size:.7rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em}
+.cmp-name{font-size:.9rem;font-weight:700;color:var(--p)}
+.cmp-city{font-size:.75rem;color:var(--txt2)}
+.cmp-price{font-size:.8rem;font-weight:700;color:var(--gn);margin-top:3px}
+.cmp-rm{font-size:.72rem;color:var(--rd);cursor:pointer;font-weight:600;margin-top:3px}
+.cmp-add{font-size:.8rem;color:var(--txt3);cursor:pointer;font-weight:500}
+
+.cmp-sel-area{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:6px;margin-bottom:1.25rem;max-height:280px;overflow-y:auto;padding:4px}
+.cmp-school-btn{padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r);background:var(--card);font-size:.8rem;font-weight:600;color:var(--txt2);cursor:pointer;text-align:left;transition:all .18s;font-family:var(--font)}
+.cmp-school-btn:hover{border-color:var(--pm);color:var(--p);background:var(--pl)}
+.cmp-school-btn.added{border-color:var(--p);background:var(--pl);color:var(--p)}
+
+.cmp-tbl{width:100%;border-collapse:collapse;min-width:480px}
+.cmp-tbl th{padding:9px 11px;text-align:left;background:var(--bg1);color:var(--txt2);font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.cmp-tbl th:first-child{border-radius:var(--r) 0 0 var(--r)}.cmp-tbl th:last-child{border-radius:0 var(--r) var(--r) 0}
+.cmp-tbl td{padding:9px 11px;border-bottom:1px solid var(--border);font-size:.83rem;color:var(--txt);font-weight:600}
+.cmp-tbl td:first-child{color:var(--txt2);font-weight:500}
+.best-v{color:var(--gn)!important;font-weight:800!important}
+
+/* RANKING */
+.rf{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:1.1rem}
+.rfb{padding:6px 14px;border:1.5px solid var(--border);border-radius:50px;background:var(--card);font-size:.78rem;font-weight:700;cursor:pointer;color:var(--txt2);transition:all .18s;font-family:var(--font)}
+.rfb.act{border-color:var(--p);background:var(--pl);color:var(--p)}
+.rk{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:.9rem 1.1rem;margin-bottom:7px;display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;transition:all .18s;cursor:pointer}
+.rk:hover{border-color:var(--pm);transform:translateX(3px);box-shadow:var(--sh-md)}
+.rk-n{font-size:1.05rem;font-weight:800;color:var(--txt3);text-align:center}
+.rk.top3 .rk-n{color:var(--p)}
+.rk-nm{font-weight:700;font-size:.88rem;color:var(--txt);margin-bottom:2px}
+.rk-city{font-size:.73rem;color:var(--txt3)}
+.rk-bud{text-align:right}
+.rk-v{font-size:.97rem;font-weight:800;color:var(--gn)}
+.rk-l{font-size:.7rem;color:var(--txt3);margin-top:1px}
+
+/* FINDER */
+.finder-h{background:linear-gradient(135deg,var(--gnl),var(--cyl));border:1.5px solid var(--gnm);border-radius:var(--rxl);padding:2rem;margin-bottom:1.5rem;text-align:center}
+.finder-t{font-size:1.25rem;font-weight:800;color:var(--txt);margin-bottom:.5rem}
+.finder-s{font-size:.85rem;color:var(--txt2);margin-bottom:1.25rem}
+.finder-row{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+.finder-inp{padding:11px 18px;border:2px solid var(--border);border-radius:50px;font-size:1rem;font-weight:700;color:var(--txt);background:var(--card);font-family:var(--font);width:180px;text-align:center;transition:border-color .18s}
+.finder-inp:focus{outline:none;border-color:var(--gn)}
+.finder-btn{padding:11px 22px;border-radius:50px;border:none;background:var(--gn);color:#fff;font-size:.88rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .18s}
+.finder-btn:hover{background:#15803d;transform:translateY(-1px)}
+.finder-r-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.finder-card{background:var(--card);border:1.5px solid var(--gnm);border-radius:var(--rl);padding:1rem;transition:all .18s}
+.finder-card:hover{transform:translateY(-2px);box-shadow:var(--sh-md)}
+.fc-name{font-weight:700;font-size:.87rem;color:var(--txt);margin-bottom:3px}
+.fc-city{font-size:.73rem;color:var(--txt3);margin-bottom:.5rem}
+.fc-bud{font-size:1.1rem;font-weight:800;color:var(--gn)}
+.fc-fees{font-size:.73rem;color:var(--txt2);margin-top:2px}
+.finder-none{text-align:center;padding:3rem;color:var(--txt3);font-size:.9rem}
+
+/* PRINT */
+@media print{
+  .abar,.racts,.restrt,.tabs,.no-print,.sbanner{display:none!important}
+  .tpane{display:block!important}
+  body{background:#fff;color:#000}
+  .rc,.cc,.kpi{break-inside:avoid;box-shadow:none;border:1px solid #ddd}
+  .km,.ks{background:#4f46e5!important;-webkit-print-color-adjust:exact}
+  .rw,.pw{max-width:100%;padding:1rem}
+  .rg{grid-template-columns:1fr 1fr}
+}
+
+/* UTILS */
+.hidden{display:none!important}
+.tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:50px;font-size:11px;font-weight:700}
+.tag-p{background:var(--pl);color:var(--p);border:1px solid var(--pm)}
+.tag-g{background:var(--gnl);color:var(--gn);border:1px solid var(--gnm)}
+.tag-a{background:var(--aml);color:var(--am);border:1px solid var(--amm)}
+.ni{font-size:.98rem;flex-shrink:0}
+.num-i{padding:8px 11px;border:2px solid var(--border);border-radius:var(--r);font-size:.9rem;font-weight:700;color:var(--txt);background:var(--card);font-family:var(--font);transition:border-color .18s;width:100%}
+.num-i:focus{outline:none;border-color:var(--p)}
+.inline-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sect-lbl{font-size:.8rem;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem}
+</style>
+</head>
+<body>
+
+<!-- ══ LANDING ══ -->
+<div id="vl" class="view active">
+  <nav class="l-nav">
+    <div class="l-logo"><div class="ldot"></div>EduBudget</div>
+    <div class="l-nav-r">
+      <button class="nav-dm" onclick="toggleDark()" title="Mode sombre" id="nav-dm-btn">🌙</button>
+    </div>
+  </nav>
+  <div class="l-hero">
+    <div class="l-badge"><div class="bdot"></div>Données officielles 2024–2025</div>
+    <h1>Calculez le <em>vrai coût</em> d'une école de commerce</h1>
+    <p>Scolarité, logement, vie quotidienne, APL, alternance et bourses CROUS — une simulation complète en 3 minutes.</p>
+    <div class="saved-band" id="saved-band">
+      <div class="saved-band-txt">💾 Vous avez une simulation en cours — reprendre ?</div>
+      <button class="saved-band-btn" onclick="resumeSim()">Reprendre</button>
+    </div>
+    <div class="l-actions">
+      <button class="la main" onclick="startWizard()">
+        <span class="la-ic">🎓</span>
+        <span class="la-t">Simuler mon budget</span>
+        <span class="la-s">Simulation personnalisée en 6 étapes</span>
+      </button>
+      <button class="la sec" onclick="showView('vc')">
+        <span class="la-ic">⚖️</span>
+        <span class="la-t">Comparer des écoles</span>
+        <span class="la-s">Jusqu'à 3 écoles côte à côte</span>
+      </button>
+      <button class="la sec" onclick="showView('vr')">
+        <span class="la-ic">🏆</span>
+        <span class="la-t">Explorer le classement</span>
+        <span class="la-s">57 écoles triées par budget</span>
+      </button>
+      <button class="la sec" onclick="showView('vf')">
+        <span class="la-ic">🔍</span>
+        <span class="la-t">Trouver dans mon budget</span>
+        <span class="la-s">Entrer un budget max</span>
+      </button>
+    </div>
+    <div class="l-chips">
+      <div class="chip">🎓 57 écoles intégrées</div>
+      <div class="chip">🏛️ APL calculées</div>
+      <div class="chip">💼 Alternance incluse</div>
+      <div class="chip">📊 Bourses CROUS</div>
+      <div class="chip">⚡ 100% gratuit</div>
+    </div>
+  </div>
+  <div class="l-feats">
+    <div class="l-feat-g">
+      <div class="lf"><div class="lf-ic fi-p">🎓</div><h3>Frais de scolarité réels</h3><p>22 Post-Prépa, 15 Post-Bac, 20 Bachelor/BBA — tarifs officiels</p></div>
+      <div class="lf"><div class="lf-ic fi-c">🏠</div><h3>Coût de la vie par ville</h3><p>3 tiers de villes avec loyers et transports adaptés à chaque campus</p></div>
+      <div class="lf"><div class="lf-ic fi-g">🏛️</div><h3>APL + Bourses CROUS</h3><p>Calcul automatique des aides selon vos revenus et situation</p></div>
+      <div class="lf"><div class="lf-ic fi-a">💼</div><h3>Alternance & Financement</h3><p>Salaires, scolarité offerte, plan d'épargne pour les parents</p></div>
+    </div>
+  </div>
+  <div class="l-foot">edubudget.app · Données issues des classements officiels du Figaro Étudiant 2024–2025</div>
+</div>
+
+<!-- ══ WIZARD ══ -->
+<div id="vw" class="view">
+  <div class="abar">
+    <div class="alogo" onclick="showView('vl')"><div class="aldot"></div>EduBudget</div>
+    <div class="adots" id="adots"></div>
+    <div class="albl" id="albl">Étape 1/6</div>
+    <button class="dm-tog" onclick="toggleDark()" title="Mode sombre" id="wdm-btn">🌙</button>
+  </div>
+  <div class="w-wrap" id="wcontent"></div>
+</div>
+
+<!-- ══ RESULTS ══ -->
+<div id="vres" class="view">
+  <div class="abar">
+    <div class="alogo" onclick="showView('vl')"><div class="aldot"></div>EduBudget</div>
+    <div style="flex:1"></div>
+    <button class="bbk no-print" onclick="showView('vl')">← Accueil</button>
+    <button class="dm-tog" onclick="toggleDark()" id="rdm-btn">🌙</button>
+  </div>
+  <div class="rw" id="rcontent"></div>
+</div>
+
+<!-- ══ COMPARE ══ -->
+<div id="vc" class="view">
+  <div class="abar">
+    <div class="alogo" onclick="showView('vl')"><div class="aldot"></div>EduBudget</div>
+    <div style="flex:1"></div>
+    <button class="bbk" onclick="showView('vl')">← Accueil</button>
+    <button class="dm-tog" onclick="toggleDark()" id="cdm-btn">🌙</button>
+  </div>
+  <div class="pw" id="vcontent"></div>
+</div>
+
+<!-- ══ RANKING ══ -->
+<div id="vr" class="view">
+  <div class="abar">
+    <div class="alogo" onclick="showView('vl')"><div class="aldot"></div>EduBudget</div>
+    <div style="flex:1"></div>
+    <button class="bbk" onclick="showView('vl')">← Accueil</button>
+    <button class="dm-tog" onclick="toggleDark()" id="rdm2-btn">🌙</button>
+  </div>
+  <div class="pw" id="rkcontent"></div>
+</div>
+
+<!-- ══ FINDER ══ -->
+<div id="vf" class="view">
+  <div class="abar">
+    <div class="alogo" onclick="showView('vl')"><div class="aldot"></div>EduBudget</div>
+    <div style="flex:1"></div>
+    <button class="bbk" onclick="showView('vl')">← Accueil</button>
+    <button class="dm-tog" onclick="toggleDark()" id="fdm-btn">🌙</button>
+  </div>
+  <div class="pw" id="fcontent"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// DATA
+// ══════════════════════════════════════
+const SCHOOLS={
+  'post-prepa':[
+    {name:"HEC Paris",rank:1,note:"19.2/20",fees:23500,city:"Jouy-en-Josas",accred:"Equis, AACSB, Amba"},
+    {name:"ESCP Business School",rank:2,note:"18.6/20",fees:22300,city:"Paris",accred:"Equis, AACSB"},
+    {name:"ESSEC Business School",rank:2,note:"18.6/20",fees:22650,city:"Cergy",accred:"Equis, AACSB, Amba"},
+    {name:"emlyon business school",rank:4,note:"17.7/20",fees:20200,city:"Lyon",accred:"Equis, AACSB, Amba"},
+    {name:"EDHEC",rank:5,note:"17.6/20",fees:19960,city:"Lille",accred:"Equis, AACSB, Amba"},
+    {name:"SKEMA Business School",rank:6,note:"17.5/20",fees:19500,city:"Suresnes",accred:"Equis, AACSB"},
+    {name:"Neoma",rank:7,note:"17.4/20",fees:17000,city:"Reims",accred:"Equis, AACSB, Amba"},
+    {name:"Audencia",rank:8,note:"17.3/20",fees:16600,city:"Nantes",accred:"Equis, AACSB, Amba"},
+    {name:"Grenoble EM (GEM)",rank:9,note:"17.1/20",fees:17000,city:"Grenoble",accred:"Equis, AACSB, Amba"},
+    {name:"Kedge",rank:9,note:"17.1/20",fees:15725,city:"Bordeaux",accred:"Equis, AACSB, Amba"},
+    {name:"TBS Education",rank:11,note:"16.8/20",fees:15000,city:"Toulouse",accred:"Equis, AACSB, Amba"},
+    {name:"Rennes School of Business",rank:12,note:"16.3/20",fees:15050,city:"Rennes",accred:"Equis, AACSB"},
+    {name:"MBS (Montpellier)",rank:13,note:"15.9/20",fees:14500,city:"Montpellier",accred:"Equis, AACSB, Amba"},
+    {name:"ICN Business School",rank:14,note:"15.6/20",fees:14500,city:"Nancy",accred:"Equis, AACSB, Amba"},
+    {name:"Burgundy SB (BSB)",rank:15,note:"15.3/20",fees:14200,city:"Dijon",accred:"Equis, AACSB"},
+    {name:"IMT-BS (Public)",rank:16,note:"15.0/20",fees:9000,city:"Évry",accred:"AACSB, Amba"},
+    {name:"ISC Paris",rank:17,note:"14.4/20",fees:10500,city:"Paris",accred:"AACSB, Amba, EFMD"},
+    {name:"Clermont School of Business",rank:18,note:"14.2/20",fees:11900,city:"Clermont-Ferrand",accred:"AACSB, Amba"},
+    {name:"INSEEC Grande École",rank:19,note:"13.8/20",fees:12950,city:"Lyon",accred:"Amba"},
+    {name:"Eklore-ed",rank:20,note:"13.5/20",fees:10600,city:"Pau",accred:"EFMD"},
+    {name:"South Champagne BS",rank:21,note:"13.3/20",fees:10000,city:"Troyes",accred:"EFMD"},
+    {name:"Brest BS",rank:22,note:"13.1/20",fees:11500,city:"Brest",accred:""},
+  ],
+  'post-bac':[
+    {name:"IÉSEG School of Management",rank:1,note:"19.3/20",fees:14230,city:"Paris",accred:"Equis, AACSB, Amba"},
+    {name:"Essca",rank:2,note:"18.3/20",fees:14045,city:"Angers",accred:"Equis, AACSB, Amba"},
+    {name:"EM Normandie",rank:3,note:"17.5/20",fees:13750,city:"Le Havre",accred:"Equis, AACSB, Amba"},
+    {name:"Excelia Business School",rank:4,note:"17.4/20",fees:13850,city:"La Rochelle",accred:"Equis, AACSB, Amba"},
+    {name:"EMLV",rank:5,note:"17.1/20",fees:12000,city:"Paris",accred:"AACSB, Amba, EFMD"},
+    {name:"EM Strasbourg (Public)",rank:6,note:"17.0/20",fees:10500,city:"Strasbourg",accred:"Equis, AACSB, Amba, EFMD"},
+    {name:"Paris School of Business",rank:7,note:"16.6/20",fees:12500,city:"Paris",accred:"Equis, AACSB, EFMD"},
+    {name:"Esdes",rank:8,note:"16.0/20",fees:12600,city:"Lyon",accred:"AACSB, EFMD"},
+    {name:"IPAG",rank:9,note:"15.8/20",fees:11200,city:"Paris",accred:"AACSB, EFMD"},
+    {name:"EDC Paris",rank:10,note:"15.6/20",fees:11200,city:"Paris",accred:"EFMD"},
+    {name:"Esce",rank:10,note:"15.6/20",fees:11950,city:"Paris",accred:"EFMD"},
+    {name:"ISG",rank:12,note:"15.4/20",fees:11020,city:"Paris",accred:""},
+    {name:"EBS Paris",rank:13,note:"15.3/20",fees:11000,city:"Paris",accred:"EFMD"},
+    {name:"IDRAC Business School",rank:14,note:"14.6/20",fees:10900,city:"Lyon",accred:""},
+    {name:"Istec",rank:15,note:"14.3/20",fees:10600,city:"Paris",accred:""},
+  ],
+  'bachelor':[
+    {name:"ESCP Business School",rank:1,program:"BSc in Management",duration:3,fees:26600,city:"Paris"},
+    {name:"ESSEC Business School",rank:2,program:"Global BBA",duration:4,fees:17500,city:"Cergy"},
+    {name:"EDHEC",rank:3,program:"International BBA",duration:4,fees:18800,city:"Lille"},
+    {name:"emlyon business school",rank:4,program:"Global BBA",duration:4,fees:14500,city:"Lyon"},
+    {name:"SKEMA Business School",rank:5,program:"Global BBA",duration:4,fees:15000,city:"Sophia-Antipolis"},
+    {name:"NEOMA",rank:6,program:"Global BBA",duration:4,fees:13000,city:"Reims"},
+    {name:"KEDGE",rank:7,program:"International BBA",duration:4,fees:14000,city:"Marseille"},
+    {name:"Audencia",rank:8,program:"Bachelor In Management",duration:3,fees:9500,city:"Nantes"},
+    {name:"Grenoble EM (GEM)",rank:9,program:"Bachelor in Int. Business",duration:3,fees:13250,city:"Grenoble"},
+    {name:"TBS Education",rank:10,program:"Bachelor in Management",duration:3,fees:12200,city:"Toulouse"},
+    {name:"Rennes SB",rank:11,program:"Bachelor in Management",duration:3,fees:10000,city:"Rennes"},
+    {name:"MBS (Montpellier)",rank:12,program:"Bachelor in Int. Business",duration:3,fees:11500,city:"Montpellier"},
+    {name:"ICN Business School",rank:13,program:"Bachelor en Management",duration:3,fees:8900,city:"Nancy"},
+    {name:"Burgundy SB (BSB)",rank:14,program:"Bachelor in Management",duration:3,fees:9000,city:"Dijon"},
+    {name:"EM Normandie",rank:15,program:"BBA",duration:4,fees:11500,city:"Le Havre"},
+    {name:"Excelia",rank:16,program:"Bachelor Business",duration:3,fees:9900,city:"La Rochelle"},
+    {name:"IÉSEG",rank:17,program:"Bachelor in Int. Business",duration:3,fees:11800,city:"Lille"},
+    {name:"ISC Paris",rank:18,program:"Bachelor in Management",duration:3,fees:9950,city:"Paris"},
+    {name:"INSEEC",rank:19,program:"Bachelor Business",duration:3,fees:8950,city:"Paris"},
+    {name:"IPAG",rank:20,program:"Bachelor",duration:3,fees:8900,city:"Paris"},
+  ]
+};
+const TIERS={1:{label:"Paris / Île-de-France",rent:850,tc:38},2:{label:"Grande ville",rent:600,tc:30},3:{label:"Ville moyenne",rent:450,tc:25}};
+const TC=['','t1','t2','t3'];
+function getTier(c){
+  const s=c.toLowerCase();
+  if(['paris','jouy','cergy','suresnes','puteaux','courbevoie','évry','evry'].some(k=>s.includes(k)))return 1;
+  if(['lyon','bordeaux','lille','nice','aix','marseille','sophia','montpellier','strasbourg','grenoble','nantes','toulouse'].some(k=>s.includes(k)))return 2;
+  return 3;
+}
+// All schools flat for ranking/compare
+function allSchools(){
+  const r=[];
+  Object.entries(SCHOOLS).forEach(([type,list])=>{
+    list.forEach(s=>r.push({...s,type}));
+  });
+  return r;
+}
+
+// ══════════════════════════════════════
+// DARK MODE
+// ══════════════════════════════════════
+let dark=localStorage.getItem('eb-dark')==='1';
+function applyDark(){
+  document.body.classList.toggle('dark',dark);
+  const ico=dark?'☀️':'🌙';
+  ['nav-dm-btn','wdm-btn','rdm-btn','cdm-btn','rdm2-btn','fdm-btn'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=ico;});
+}
+function toggleDark(){dark=!dark;localStorage.setItem('eb-dark',dark?'1':'0');applyDark();}
+applyDark();
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let S={step:1,cursus:null,school:null,duration:3,alternance:false,housing:null,apl:false,food:250,transport:'tc',leisure:100,misc:50,months:10};
+let cmpSchools=[];
+let rkFilter='all';
+
+// ══════════════════════════════════════
+// FORMAT & CALC
+// ══════════════════════════════════════
+const f=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(Math.round(n));
+const chk='<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+function calcLv(){
+  const td=TIERS[getTier(S.school.city)];
+  const rent=S.housing==='coloc'?Math.round(td.rent*.8):S.housing==='studio'?td.rent:0;
+  const apl=(S.apl&&S.housing!=='parents')?Math.min(Math.round(rent*.35),280):0;
+  const netRent=rent-apl;
+  const tc=S.transport==='tc'?td.tc:S.transport==='voiture'?td.tc+100:0;
+  return{rent,apl,netRent,food:S.food,tc,leisure:S.leisure,misc:S.misc,monthly:Math.round(netRent+S.food+tc+S.leisure+S.misc)};
+}
+function calcAll(){
+  const lv=calcLv();const dur=S.duration;
+  const altYrs=S.alternance?(S.cursus==='bachelor'?1:2):0;
+  let tT=0,tH=0,tL=0,tA=0;const yrs=[];
+  for(let y=1;y<=dur;y++){
+    const isA=S.alternance&&y>(dur-altYrs);
+    const tuition=isA?0:S.school.fees;
+    const housing=lv.netRent*S.months;
+    const living=(lv.food+lv.tc+lv.leisure+lv.misc)*S.months;
+    const inc=isA?1100*12:0;
+    tT+=tuition;tH+=housing;tL+=living;tA+=inc;
+    yrs.push({y,isA,tuition,housing,living,inc,net:tuition+housing+living-inc});
+  }
+  const gross=tT+tH+tL;
+  return{lv,yrs,tT,tH,tL,tA,gross,net:gross-tA,altYrs,aplTotal:lv.apl*S.months*dur};
+}
+function calcSchoolBudget(school,housing='studio',food=250,transport='tc',leisure=100,misc=50,months=10){
+  const td=TIERS[getTier(school.city)];
+  const rent=housing==='coloc'?Math.round(td.rent*.8):housing==='studio'?td.rent:0;
+  const tc=transport==='tc'?td.tc:transport==='voiture'?td.tc+100:0;
+  const monthly=rent+food+tc+leisure+misc;
+  return{monthly,annual:Math.round(school.fees+monthly*months),tuition:school.fees,living:Math.round(monthly*months)};
+}
+
+// CROUS
+function calcCROUS(rfr,parts){
+  const pp=rfr/parts;
+  if(pp>33000)return{echelon:null,monthly:0};
+  const E=[{e:'0bis',m:107,l:33000},{e:1,m:170,l:26000},{e:2,m:270,l:20000},{e:3,m:370,l:15000},{e:4,m:440,l:11000},{e:5,m:510,l:8000},{e:6,m:555,l:5000},{e:7,m:600,l:0}];
+  for(const e of E){if(pp>e.l)return{echelon:e.e,monthly:e.m};}
+  return{echelon:7,monthly:600};
+}
+// Savings
+function calcSavings(total,years){
+  if(years<=0)return total;
+  const r=0.02/12,n=years*12;
+  return Math.round(total*r/(Math.pow(1+r,n)-1));
+}
+
+// ══════════════════════════════════════
+// VIEW ROUTER
+// ══════════════════════════════════════
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='vr')renderRanking();
+  if(id==='vc')renderCompare();
+  if(id==='vf')renderFinder();
+  applyDark();
+}
+
+// ══════════════════════════════════════
+// SAVE / LOAD / SHARE
+// ══════════════════════════════════════
+function saveState(){
+  if(!S.school)return;
+  localStorage.setItem('eb-state',JSON.stringify({
+    cursus:S.cursus,
+    si:SCHOOLS[S.cursus].indexOf(S.school),
+    duration:S.duration,alternance:S.alternance,housing:S.housing,
+    apl:S.apl,food:S.food,transport:S.transport,leisure:S.leisure,misc:S.misc,months:S.months
+  }));
+}
+function loadSaved(){
+  const raw=localStorage.getItem('eb-state');
+  if(!raw)return false;
+  try{
+    const d=JSON.parse(raw);
+    if(!d.cursus||d.si<0)return false;
+    S.cursus=d.cursus;S.school=SCHOOLS[d.cursus][d.si];
+    S.duration=d.duration;S.alternance=d.alternance;S.housing=d.housing;
+    S.apl=d.apl;S.food=d.food;S.transport=d.transport;S.leisure=d.leisure;S.misc=d.misc;S.months=d.months;
+    return true;
+  }catch(e){return false;}
+}
+function resumeSim(){
+  if(loadSaved()){S.step=6;showView('vw');renderWizard();}
+}
+function getShareLink(){
+  if(!S.school)return window.location.href;
+  const p=new URLSearchParams({c:S.cursus,si:SCHOOLS[S.cursus].indexOf(S.school),d:S.duration,a:S.alternance?1:0,h:S.housing||'',apl:S.apl?1:0,f:S.food,t:S.transport,l:S.leisure,m:S.misc,mo:S.months});
+  return window.location.href.split('?')[0]+'?'+p.toString();
+}
+function copyLink(){
+  const link=getShareLink();
+  navigator.clipboard.writeText(link).then(()=>{
+    const btn=document.getElementById('share-copy-btn');
+    if(btn){btn.textContent='✓ Copié !';setTimeout(()=>btn.textContent='Copier le lien',2000);}
+  });
+}
+function loadFromURL(){
+  const p=new URLSearchParams(window.location.search);
+  if(!p.get('c'))return false;
+  try{
+    S.cursus=p.get('c');S.school=SCHOOLS[S.cursus][parseInt(p.get('si'))];
+    S.duration=parseInt(p.get('d'));S.alternance=p.get('a')==='1';S.housing=p.get('h');
+    S.apl=p.get('apl')==='1';S.food=parseInt(p.get('f'));S.transport=p.get('t');
+    S.leisure=parseInt(p.get('l'));S.misc=parseInt(p.get('m'));S.months=parseInt(p.get('mo'));
+    return true;
+  }catch(e){return false;}
+}
+
+// ══════════════════════════════════════
+// WIZARD
+// ══════════════════════════════════════
+function renderWizard(){
+  const dots=Array.from({length:6},(_,i)=>`<div class="ad ${i+1<S.step?'done':i+1===S.step?'cur':''}"></div>`).join('');
+  document.getElementById('adots').innerHTML=dots;
+  document.getElementById('albl').textContent=`Étape ${S.step}/6`;
+  const fns=[ws1,ws2,ws3,ws4,ws5,ws6];
+  document.getElementById('wcontent').innerHTML=`<div class="sc">${fns[S.step-1]()}</div>`;
+}
+function eb(n,l){return`<div class="ebrow"><span class="sbadge">Étape ${n}</span><span style="font-size:.78rem;color:var(--txt3);font-weight:500">${l}</span></div>`}
+
+function ws1(){return`${eb(1,'Cursus')}
+<div class="stit">Quel cursus visez-vous ?</div>
+<div class="ssub">Le cursus détermine les écoles disponibles et la durée standard.</div>
+<div class="og og3">
+${[{v:'post-prepa',ic:'🎓',n:'Post-Prépa',d:'Programme Grande École · 3 ans',p:'22 écoles'},
+  {v:'post-bac',ic:'📚',n:'Post-Bac',d:'Programme 5 ans après le bac',p:'15 écoles'},
+  {v:'bachelor',ic:'🏆',n:'Bachelor / BBA',d:'3 ou 4 ans selon programme',p:'20 écoles'}
+].map(o=>`<div class="oc ${S.cursus===o.v?'sel':''}" onclick="setCursus('${o.v}')">
+  <div class="oc-chk">${chk}</div><span class="oc-i">${o.ic}</span>
+  <div class="oc-n">${o.n}</div><div class="oc-d">${o.d}</div>
+  <div class="oc-p" ${o.v==='bachelor'?'style="color:var(--am)"':''}>${o.p}</div>
+</div>`).join('')}
+</div>
+<div class="nav">
+  <button class="bbk" onclick="showView('vl')">← Accueil</button>
+  <button class="bnx" onclick="nxt()" ${!S.cursus?'disabled':''}>Suivant →</button>
+</div>`;}
+
+function ws2(){
+  const list=SCHOOLS[S.cursus];
+  const opts=list.map((s,i)=>`<option value="${i}" ${S.school===s?'selected':''}>${s.rank>0?s.rank+'. ':''}${s.name}${S.cursus==='bachelor'?' ('+s.program+')':''} — ${f(s.fees)}/an</option>`).join('');
+  let info='';
+  if(S.school){
+    const t=getTier(S.school.city);const td=TIERS[t];
+    const fields=S.cursus==='bachelor'
+      ?[['Programme',S.school.program],['Durée',S.school.duration+' ans'],['Frais / an',f(S.school.fees)],['Ville',S.school.city]]
+      :[['Note Figaro',S.school.note],['Frais / an',f(S.school.fees)],['Ville',S.school.city],['Accréditations',S.school.accred||'N/A']];
+    info=`<div class="sinf">${fields.map(([l,v])=>`<div><div class="si-l">${l}</div><div class="si-v">${v}</div></div>`).join('')}</div>
+    <div style="margin-top:.5rem"><span class="tier ${TC[t]}">${td.label}</span></div>`;
+  }
+  return`${eb(2,'École')}<div class="stit">Choisissez votre école</div>
+<div class="ssub">Frais officiels 2024–2025 · ${list.length} établissements</div>
+<div class="sw"><select class="ssel" onchange="setSchool(this.value)">
+<option value="">— Sélectionnez une école —</option>${opts}</select>
+<span class="sarr">▾</span></div>${info}
+<div class="nav">
+  <button class="bbk" onclick="prv()">← Retour</button>
+  <button class="bnx" onclick="nxt()" ${!S.school?'disabled':''}>Suivant →</button>
+</div>`;}
+
+function ws3(){
+  const locked=S.cursus==='bachelor';if(locked)S.duration=S.school.duration;
+  return`${eb(3,'Durée')}<div class="stit">Durée des études</div>
+<div class="ssub">Combien d'années souhaitez-vous financer ?</div>
+${!locked?`<input type="range" class="rng" min="1" max="5" step="1" value="${S.duration}" oninput="setDur(parseInt(this.value))" style="margin-bottom:.25rem">`:``}
+<div class="dv">${S.duration}<span style="font-size:1.4rem;font-weight:700;color:var(--txt3)"> an${S.duration>1?'s':''}</span></div>
+<div class="dbs">${[1,2,3,4,5].map(d=>`<button class="db ${S.duration===d?'act':''}" onclick="setDur(${d})" ${locked&&d!==S.school.duration?'disabled':''} style="${locked&&d!==S.school.duration?'opacity:.2':''}">${d} an${d>1?'s':''}</button>`).join('')}</div>
+${locked?`<div class="ntc no"><span class="ni">🔒</span>Durée fixée : <strong>${S.school.program}</strong> = <strong>${S.school.duration} ans</strong></div>`:''}
+<div class="ntc nb"><span class="ni">💰</span>Scolarité totale estimée : <strong>${f(S.school.fees*(locked?S.school.duration:S.duration))}</strong></div>
+<div class="nav">
+  <button class="bbk" onclick="prv()">← Retour</button>
+  <button class="bnx" onclick="nxt()">Suivant →</button>
+</div>`;}
+
+function ws4(){
+  const ay=S.cursus==='bachelor'?1:2;
+  return`${eb(4,'Alternance')}<div class="stit">Faites-vous une alternance ?</div>
+<div class="ssub">Supprime les frais sur ${ay===1?'la dernière année':'les 2 dernières années'} · Salaire moyen 1 100€/mois</div>
+<div class="og og2">
+  <div class="oc ${!S.alternance?'sel':''}" onclick="setAlt(false)">
+    <div class="oc-chk">${chk}</div><span class="oc-i">📖</span>
+    <div class="oc-n">Formation initiale</div><div class="oc-d">Temps plein sur les cours</div>
+  </div>
+  <div class="oc ${S.alternance?'sel-g':''}" onclick="setAlt(true)">
+    <div class="oc-chk" style="${S.alternance?'display:flex;background:var(--gn)':''}">${chk}</div>
+    <span class="oc-i">💼</span>
+    <div class="oc-n">En alternance</div>
+    <div class="oc-d">${ay===1?'Dernière année':'2 dernières années'} en entreprise</div>
+    <div class="oc-p oc-p-g">+${f(ay*1100*12)} de revenus</div>
+  </div>
+</div>
+${S.alternance?`<div class="ntc ng"><span class="ni">🎉</span>Économie totale estimée : <strong>${f(ay*1100*12+S.school.fees*ay)}</strong> (scolarité offerte + salaires)</div>`:''}
+<div class="nav">
+  <button class="bbk" onclick="prv()">← Retour</button>
+  <button class="bnx" onclick="nxt()">Suivant →</button>
+</div>`;}
+
+function ws5(){
+  const t=getTier(S.school.city);const td=TIERS[t];
+  const rC=Math.round(td.rent*.8),rS=td.rent;
+  const aplC=Math.min(Math.round(rC*.35),280),aplS=Math.min(Math.round(rS*.35),280);
+  const showApl=S.housing&&S.housing!=='parents';
+  const cr=S.housing==='coloc'?rC:S.housing==='studio'?rS:0;
+  const ca=S.apl&&showApl?Math.min(Math.round(cr*.35),280):0;
+  return`${eb(5,'Logement')}<div class="stit">Où allez-vous habiter ?</div>
+<div class="ssub">Ville : <strong>${S.school.city}</strong> — <span class="tier ${TC[t]}">${td.label}</span></div>
+<div class="og og3">
+${[{v:'parents',ic:'🏠',n:'Chez les parents',d:'Aucun frais de logement',p:'0€/mois'},
+  {v:'coloc',ic:'🤝',n:'Colocation',d:'−20% sur le loyer moyen',p:f(rC)+'/mois'},
+  {v:'studio',ic:'🏢',n:'Studio / Résidence',d:'Loyer moyen de la ville',p:f(rS)+'/mois'}
+].map(o=>`<div class="oc ${S.housing===o.v?'sel':''}" onclick="setHousing('${o.v}')">
+  <div class="oc-chk">${chk}</div><span class="oc-i">${o.ic}</span>
+  <div class="oc-n">${o.n}</div><div class="oc-d">${o.d}</div><div class="oc-p">${o.p}</div>
+  ${o.v==='coloc'&&S.housing==='coloc'?`<div style="font-size:10px;color:var(--gn);margin-top:3px;font-weight:700">APL possible : −${f(aplC)}/mois</div>`:''}
+  ${o.v==='studio'&&S.housing==='studio'?`<div style="font-size:10px;color:var(--gn);margin-top:3px;font-weight:700">APL possible : −${f(aplS)}/mois</div>`:''}
+</div>`).join('')}
+</div>
+${showApl?`<div class="apl-b"><div style="font-size:1.35rem">🏛️</div><div style="flex:1">
+  <label class="trow" onclick="toggleApl()">
+    <div class="tog ${S.apl?'on':''}"><div class="togk"></div></div>
+    Éligible aux APL (Aide au logement CAF)
+  </label>
+  ${S.apl?`<div style="font-size:.76rem;color:#166534;margin-top:4px;font-weight:500">Déduction : <strong>−${f(ca)}/mois</strong> · Net : <strong>${f(cr-ca)}/mois</strong></div>`:''}
+</div></div>`:''}
+<div class="nav">
+  <button class="bbk" onclick="prv()">← Retour</button>
+  <button class="bnx" onclick="nxt()" ${!S.housing?'disabled':''}>Suivant →</button>
+</div>`;}
+
+function ws6(){
+  const td=TIERS[getTier(S.school.city)];
+  const lv=calcLv();const p=Math.min(100,Math.round(S.leisure/3));
+  return`${eb(6,'Style de vie')}<div class="stit">Vos dépenses mensuelles</div>
+<div class="ssub">Affinez pour obtenir une estimation précise de votre budget réel.</div>
+<div class="ls-s">
+  <div class="ls-l">🍔 Alimentation & Courses</div>
+  <div class="og" style="grid-template-columns:repeat(3,1fr)">
+  ${[{v:150,l:'🥦 Éco',d:'Cuisine maison'},{v:250,l:'🍽️ Standard',d:'Mixte'},{v:400,l:'🍜 Confort',d:'Restos/Livraisons'}].map(o=>`
+    <div class="oc ${S.food===o.v?'sel':''}" onclick="setFood(${o.v})" style="padding:.9rem .75rem">
+      <div class="oc-n" style="font-size:.79rem">${o.l}</div>
+      <div class="oc-d">${o.d}</div>
+      <div class="oc-p">${f(o.v)}/mois</div>
+    </div>`).join('')}
+  </div>
+</div>
+<div class="ls-s">
+  <div class="ls-l">🚌 Transport</div>
+  <div class="og" style="grid-template-columns:repeat(3,1fr)">
+  ${[{v:'tc',l:'🚌 Transports',d:`${td.tc}€/mois`},{v:'velo',l:'🚲 Vélo',d:'0€/mois'},{v:'voiture',l:'🚗 Voiture',d:`${td.tc+100}€/mois`}].map(o=>`
+    <div class="oc ${S.transport===o.v?'sel':''}" onclick="setTr('${o.v}')" style="padding:.9rem .75rem">
+      <div class="oc-n" style="font-size:.79rem">${o.l}</div>
+      <div class="oc-d">${o.d}</div>
+    </div>`).join('')}
+  </div>
+</div>
+<div class="ls-s">
+  <div class="ls-l">🎉 Loisirs <span style="margin-left:auto;font-weight:800;color:var(--p);font-size:.85rem" id="lv-d">${f(S.leisure)}/mois</span></div>
+  <input type="range" class="rng" min="0" max="300" step="10" value="${S.leisure}" id="lsldr"
+    oninput="S.leisure=parseInt(this.value);document.getElementById('lv-d').textContent=new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(S.leisure)+'/mois';this.style.background='linear-gradient(to right,var(--p) '+Math.round(S.leisure/3)+'%,var(--bg2) '+Math.round(S.leisure/3)+'%)';updPrev()"
+    style="background:linear-gradient(to right,var(--p) ${p}%,var(--bg2) ${p}%);margin-top:.25rem">
+  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--txt3);margin-top:3px"><span>0€</span><span>300€</span></div>
+</div>
+<div class="ls-s">
+  <div class="ls-l">📱 Abonnements & Autres</div>
+  <div class="inline-row">
+    <span style="font-size:.82rem;color:var(--txt3)">Mensuel estimé :</span>
+    <input type="number" value="${S.misc}" min="0" max="500" step="5" class="num-i" style="width:85px;text-align:center"
+      onchange="S.misc=parseInt(this.value)||0;updPrev()">
+    <span style="font-size:.82rem;color:var(--txt3)">€/mois</span>
+  </div>
+</div>
+<div class="ls-prev" id="ls-prev">
+  <div style="font-size:.72rem;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Budget de vie mensuel estimé</div>
+  <div style="font-size:1.95rem;font-weight:800;color:var(--p);letter-spacing:-.04em">${f(lv.monthly)}<span style="font-size:.9rem;font-weight:500;color:var(--p2)">/mois</span></div>
+  <div style="font-size:.76rem;color:var(--txt2);margin-top:3px">${f(lv.monthly*S.months)}/an · <strong style="color:var(--txt)">${f(lv.monthly*S.months*S.duration)}</strong> sur ${S.duration} an${S.duration>1?'s':''}</div>
+</div>
+<div class="nav">
+  <button class="bbk" onclick="prv()">← Retour</button>
+  <button class="bnx" onclick="doResults()">Voir mon budget →</button>
+</div>`;}
+
+function updPrev(){
+  const lv=calcLv();const el=document.getElementById('ls-prev');if(!el)return;
+  el.children[1].innerHTML=f(lv.monthly)+'<span style="font-size:.9rem;font-weight:500;color:var(--p2)">/mois</span>';
+  el.children[2].textContent=f(lv.monthly*S.months)+'/an · '+f(lv.monthly*S.months*S.duration)+' sur '+S.duration+' an'+(S.duration>1?'s':'');
+}
+
+// ══════════════════════════════════════
+// RESULTS
+// ══════════════════════════════════════
+let crousRFR=40000,crousParts=3,savYears=3;
+
+function doResults(){saveState();showView('vres');renderResults();}
+
+function renderResults(){
+  const R=calcAll();
+  const pT=Math.round(R.tT/R.gross*100),pH=Math.round(R.tH/R.gross*100),pL=100-pT-pH;
+  const typeLabel=S.cursus==='post-prepa'?'PGE':S.cursus==='post-bac'?'Post-Bac':'Bachelor';
+  const crous=calcCROUS(crousRFR,crousParts);
+  const crousAnnual=crous.monthly*10;
+  const crousTotal=crousAnnual*S.duration;
+  const savRes=calcSavings(R.net,savYears);
+
+  document.getElementById('rcontent').innerHTML=`
+<div class="r-hero">
+  <div><span class="rstag">🎓 ${S.school.name}${S.cursus==='bachelor'?' · '+S.school.program:''} · ${typeLabel}</span></div>
+  <div class="rtit">Budget sur ${S.duration} an${S.duration>1?'s':''}</div>
+  <div class="rsub">${S.school.city} · ${S.months} mois/an pris en compte</div>
+</div>
+
+<div class="racts no-print">
+  <button class="ract print-btn" onclick="window.print()">🖨️ Exporter PDF</button>
+  <button class="ract" onclick="copyShareLink()">🔗 Partager</button>
+  <button class="ract" onclick="saveState();alert('Simulation sauvegardée !')">💾 Sauvegarder</button>
+</div>
+<div class="ntc ng no-print" id="share-notice" style="display:none"><span class="ni">✓</span>Lien copié dans le presse-papier !</div>
+
+<div class="kpis">
+  <div class="kpi km"><div class="kl">💰 Budget net total</div><div class="kv">${f(R.net)}</div>
+    <div class="ksub">${R.tA>0?`Alternance déduite (${f(R.tA)})`:`Brut : ${f(R.gross)}`}</div></div>
+  <div class="kpi ks"><div class="kl">📅 Budget mensuel</div><div class="kv">${f(R.lv.monthly)}</div>
+    <div class="ksub">Logement + vie · ${f(R.lv.monthly*S.months)}/an</div></div>
+  <div class="kpi ka"><div class="kl">🎓 Scolarité seule</div><div class="kv">${f(R.tT)}</div>
+    <div class="ksub">${f(Math.round(R.tT/S.duration))}/an en moyenne</div></div>
+</div>
+
+${R.tA>0?`<div class="sbanner">
+  <div class="sbico">💼</div>
+  <div><div class="sbl">Économies alternance</div>
+    <div class="sbv">${f(R.tA+R.tT*(R.altYrs/S.duration))}</div>
+    <div class="sbs">${R.altYrs} an${R.altYrs>1?'s':''} de scolarité offert${R.altYrs>1?'s':''} + ${f(R.tA)} de revenus salariés</div>
+  </div>
+</div>`:''}
+
+<div class="tabs no-print">
+  <button class="tab act" onclick="switchTab(0)">📊 Synthèse</button>
+  <button class="tab" onclick="switchTab(1)">💰 Financement</button>
+  <button class="tab" onclick="switchTab(2)">📈 Timeline</button>
+  <button class="tab" onclick="switchTab(3)">🏛️ CROUS</button>
+  <button class="tab" onclick="switchTab(4)">🔗 Partager</button>
+</div>
+
+<!-- TAB 0: SYNTHESE -->
+<div class="tpane act" id="tp0">
+  <div class="rg">
+    <div class="rc">
+      <div class="rch"><div class="rci ri-p">🎓</div><div><div class="rct">Scolarité</div></div></div>
+      ${R.yrs.map(y=>`<div class="rl">
+        <div class="rll"><span class="yp ${y.isA?'alt':''}">An ${y.y}${y.isA?' · Alt.':''}</span></div>
+        <div class="rlv ${y.isA?'g':''}">${y.isA?'Gratuit':f(y.tuition)}</div>
+      </div>`).join('')}
+      ${R.tA>0?`<div class="rl" style="margin-top:5px;background:var(--gnl);border-radius:7px;padding:4px 8px">
+        <div class="rll" style="color:var(--gn);font-weight:600">Revenus alternance</div>
+        <div class="rlv g">+${f(R.tA)}</div>
+      </div>`:''}
+      <div class="rl tot"><div class="rll">Scolarité nette</div><div class="rlv p">${f(R.tT-R.tA)}</div></div>
+    </div>
+    <div class="rc">
+      <div class="rch"><div class="rci ri-c">🏠</div>
+        <div><div class="rct">Vie quotidienne</div>
+          <div class="mt" style="margin-top:5px">
+            <button class="mb ${S.months===10?'act':''}" onclick="setMonths(10)">10 mois</button>
+            <button class="mb ${S.months===12?'act':''}" onclick="setMonths(12)">12 mois</button>
+          </div>
+        </div>
+      </div>
+      ${R.lv.rent>0?`<div class="rl"><div class="rll">🏢 Loyer brut</div><div class="rlv">${f(R.lv.rent)}/mois</div></div>`
+        :`<div class="rl"><div class="rll">🏠 Logement</div><div class="rlv g">0€ (chez parents)</div></div>`}
+      ${R.lv.apl>0?`<div class="rl"><div class="rll" style="color:var(--gn)">🏛️ APL CAF</div><div class="rlv g">−${f(R.lv.apl)}/mois</div></div>
+        <div class="rl"><div class="rll">🏢 Loyer net</div><div class="rlv">${f(R.lv.netRent)}/mois</div></div>`:''}
+      <div class="rl"><div class="rll">🍔 Alimentation</div><div class="rlv">${f(R.lv.food)}/mois</div></div>
+      <div class="rl"><div class="rll">🚌 Transport</div><div class="rlv">${f(R.lv.tc)}/mois</div></div>
+      <div class="rl"><div class="rll">🎉 Loisirs</div><div class="rlv">${f(R.lv.leisure)}/mois</div></div>
+      <div class="rl"><div class="rll">📱 Autres</div><div class="rlv">${f(R.lv.misc)}/mois</div></div>
+      <div class="rl tot"><div class="rll">Total mensuel</div><div class="rlv p">${f(R.lv.monthly)}/mois</div></div>
+      <div class="rl tot" style="border-top:none;padding-top:2px"><div class="rll">Vie sur ${S.duration} ans</div><div class="rlv">${f(R.tH+R.tL)}</div></div>
+      ${R.aplTotal>0?`<div class="rl" style="font-size:.76rem"><div class="rll" style="color:var(--gn)">dont APL sur cursus</div><div class="rlv g">−${f(R.aplTotal)}</div></div>`:''}
+    </div>
+  </div>
+  <div class="cc">
+    <div class="cch"><div class="cct">Répartition globale des dépenses</div></div>
+    <div class="rl"><div class="rll">🎓 Scolarité</div><div class="rlv">${f(R.tT)} <span style="color:var(--txt3);font-weight:400">(${pT}%)</span></div></div>
+    <div class="bbar"><div class="bs bs-t" style="width:${pT}%"></div></div>
+    <div class="rl"><div class="rll">🏠 Logement</div><div class="rlv">${f(R.tH)} <span style="color:var(--txt3);font-weight:400">(${pH}%)</span></div></div>
+    <div class="bbar"><div class="bs bs-h" style="width:${pH}%"></div></div>
+    <div class="rl"><div class="rll">🛒 Vie courante</div><div class="rlv">${f(R.tL)} <span style="color:var(--txt3);font-weight:400">(${pL}%)</span></div></div>
+    <div class="bbar"><div class="bs bs-l" style="width:${pL}%"></div></div>
+    ${R.tA>0?`<div class="rl" style="margin-top:3px"><div class="rll" style="color:var(--gn)">💼 Revenus alternance</div><div class="rlv g">−${f(R.tA)}</div></div>`:''}
+    <div class="rl tot"><div class="rll">Budget net total</div><div class="rlv p" style="font-size:1.05rem">${f(R.net)}</div></div>
+  </div>
+  <div class="cc">
+    <div class="cch">
+      <div class="cct">Répartition par année</div>
+      <div class="leg">
+        <div class="li"><div class="ld" style="background:var(--p)"></div>Scolarité</div>
+        <div class="li"><div class="ld" style="background:var(--am)"></div>Logement</div>
+        <div class="li"><div class="ld" style="background:var(--cy)"></div>Vie courante</div>
+        ${R.tA>0?'<div class="li"><div class="ld" style="background:#f87171"></div>Revenus alt.</div>':''}
+      </div>
+    </div>
+    <canvas id="yrchart" height="180"></canvas>
+  </div>
+</div>
+
+<!-- TAB 1: FINANCEMENT -->
+<div class="tpane" id="tp1">
+  <div class="savc">
+    <div class="rch"><div class="rci ri-p">💰</div><div><div class="rct">Plan d'épargne parentale</div><div class="rcs">Combien mettre de côté par mois pour financer ce budget ?</div></div></div>
+    <div class="rl"><div class="rll">Budget total à financer</div><div class="rlv p">${f(R.net)}</div></div>
+    <div style="margin-top:1rem">
+      <div class="sect-lbl">Années d'épargne avant le début des études</div>
+      <div class="inline-row" style="margin-top:.5rem">
+        ${[1,2,3,4,5,6].map(y=>`<button class="db ${savYears===y?'act':''}" onclick="savYears=${y};renderResults()">${y} an${y>1?'s':''}</button>`).join('')}
+      </div>
+    </div>
+    <div class="savr">
+      <div style="font-size:.75rem;opacity:.75;margin-bottom:.3rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em">Épargne mensuelle nécessaire</div>
+      <div class="savr-v">${f(savRes)}<span style="font-size:1rem;font-weight:400;opacity:.75">/mois</span></div>
+      <div class="savr-s">Avec un taux d'intérêt estimé de 2%/an sur ${savYears} an${savYears>1?'s':''}</div>
+    </div>
+    <div class="ntc nb" style="margin-top:.75rem"><span class="ni">ℹ️</span>Estimation indicative. Consultez un conseiller financier pour un plan d'épargne personnalisé.</div>
+    <div style="margin-top:1.1rem">
+      <div class="sect-lbl" style="margin-bottom:.75rem">Décomposition du budget à financer</div>
+      <div class="rl"><div class="rll">Scolarité nette (après alt.)</div><div class="rlv">${f(R.tT-R.tA)}</div></div>
+      <div class="rl"><div class="rll">Logement sur ${S.duration} ans</div><div class="rlv">${f(R.tH)}</div></div>
+      <div class="rl"><div class="rll">Vie courante sur ${S.duration} ans</div><div class="rlv">${f(R.tL)}</div></div>
+      ${R.aplTotal>0?`<div class="rl"><div class="rll" style="color:var(--gn)">APL déduites</div><div class="rlv g">−${f(R.aplTotal)}</div></div>`:''}
+      <div class="rl tot"><div class="rll">Total net</div><div class="rlv p">${f(R.net)}</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: TIMELINE -->
+<div class="tpane" id="tp2">
+  <div class="cc">
+    <div class="cch"><div class="cct">Cumul des dépenses mois par mois</div></div>
+    <canvas id="timeline-chart" height="200"></canvas>
+  </div>
+  <div class="rg">
+    ${R.yrs.map(y=>`<div class="rc">
+      <div class="rch"><div class="rci ${y.isA?'ri-g':'ri-p'}">${y.isA?'💼':'📅'}</div>
+        <div><div class="rct">Année ${y.y}${y.isA?' · Alternance':''}</div></div>
+      </div>
+      <div class="rl"><div class="rll">Scolarité</div><div class="rlv ${y.isA?'g':''}">${y.isA?'Gratuite':f(y.tuition)}</div></div>
+      <div class="rl"><div class="rll">Logement</div><div class="rlv">${f(y.housing)}</div></div>
+      <div class="rl"><div class="rll">Vie courante</div><div class="rlv">${f(y.living)}</div></div>
+      ${y.isA?`<div class="rl"><div class="rll" style="color:var(--gn)">Revenus alternance</div><div class="rlv g">+${f(y.inc)}</div></div>`:''}
+      <div class="rl tot"><div class="rll">Net année ${y.y}</div><div class="rlv p">${f(y.net)}</div></div>
+    </div>`).join('')}
+  </div>
+</div>
+
+<!-- TAB 3: CROUS -->
+<div class="tpane" id="tp3">
+  <div class="rc">
+    <div class="rch"><div class="rci ri-g">🏛️</div><div><div class="rct">Simulateur Bourse CROUS</div><div class="rcs">Estimez votre échelon selon les revenus du foyer</div></div></div>
+    <div style="margin-bottom:1rem">
+      <div class="sect-lbl" style="margin-bottom:.5rem">Revenu fiscal de référence (RFR) du foyer</div>
+      <div class="inline-row">
+        <input type="number" value="${crousRFR}" min="0" max="200000" step="1000" class="num-i" style="width:150px"
+          onchange="crousRFR=parseInt(this.value)||0;renderResults()">
+        <span style="font-size:.83rem;color:var(--txt3)">€ / an</span>
+      </div>
+      <div style="font-size:.75rem;color:var(--txt3);margin-top:5px">Trouvez le RFR sur votre avis d'imposition (case 1BQ)</div>
+    </div>
+    <div>
+      <div class="sect-lbl" style="margin-bottom:.5rem">Nombre de personnes dans le foyer fiscal</div>
+      <div class="inline-row">
+        ${[1,2,3,4,5,6].map(n=>`<button class="db ${crousParts===n?'act':''}" onclick="crousParts=${n};renderResults()">${n}</button>`).join('')}
+      </div>
+    </div>
+    ${crous.echelon!==null?`
+      <div class="crous-r">
+        <div style="font-size:.72rem;font-weight:700;color:var(--gn);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem">Bourse estimée</div>
+        <div class="crous-v">${f(crous.monthly)}<span style="font-size:.9rem;font-weight:500;color:var(--gn)"> /mois</span></div>
+        <div style="font-size:.78rem;color:#166534;margin-top:.35rem">Échelon ${crous.echelon} · ${f(crousAnnual)}/an (10 mois) · <strong>${f(crousTotal)}</strong> sur le cursus</div>
+      </div>
+      <div class="ntc ng" style="margin-top:.75rem"><span class="ni">💡</span>Avec la bourse CROUS, votre budget net passerait de <strong>${f(R.net)}</strong> à <strong>${f(R.net-crousTotal)}</strong></div>
+    `:`<div class="crous-none" style="margin-top:.875rem">❌ D'après ces revenus, vous ne seriez pas éligible à une bourse CROUS.<br><span style="font-size:.78rem;opacity:.75">Le plafond de revenus dépend du nombre de personnes dans le foyer.</span></div>`}
+    <div class="ntc nb" style="margin-top:.75rem"><span class="ni">ℹ️</span>Simulation indicative. Le calcul officiel prend en compte d'autres critères. Déposez votre dossier sur <strong>messervices.etudiant.gouv.fr</strong></div>
+  </div>
+</div>
+
+<!-- TAB 4: SHARE -->
+<div class="tpane" id="tp4">
+  <div class="rc">
+    <div class="rch"><div class="rci ri-c">🔗</div><div><div class="rct">Partager cette simulation</div><div class="rcs">Partagez le lien avec vos parents ou un conseiller</div></div></div>
+    <p style="font-size:.83rem;color:var(--txt2);margin-bottom:.75rem">Copiez ce lien — la simulation sera entièrement reconstituée à l'ouverture.</p>
+    <div class="share-row">
+      <input class="share-i" id="share-url" value="${getShareLink()}" readonly onclick="this.select()">
+      <button class="share-b" id="share-copy-btn" onclick="copyLink()">Copier le lien</button>
+    </div>
+    <div style="margin-top:1.25rem;padding-top:1.1rem;border-top:1px solid var(--border)">
+      <div class="sect-lbl" style="margin-bottom:.6rem">Résumé à partager</div>
+      <div style="background:var(--bg1);border-radius:var(--rl);padding:1rem;font-size:.83rem;color:var(--txt2);line-height:1.75">
+        🎓 <strong style="color:var(--txt)">${S.school.name}${S.cursus==='bachelor'?' — '+S.school.program:''}</strong><br>
+        📍 ${S.school.city} · ${S.cursus==='post-prepa'?'PGE':S.cursus==='post-bac'?'Post-Bac':'Bachelor'} · ${S.duration} ans<br>
+        💰 Budget net total : <strong style="color:var(--p)">${f(R.net)}</strong><br>
+        📅 Budget mensuel : <strong style="color:var(--p)">${f(R.lv.monthly)}/mois</strong><br>
+        ${R.tA>0?`💼 Avec alternance : <strong style="color:var(--gn)">${f(R.tA)} déduits</strong><br>`:''}
+        Simulation réalisée sur <strong>edubudget.app</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ntc nb no-print" style="margin-top:.875rem"><span class="ni">ℹ️</span>Estimations indicatives basées sur des moyennes. Les frais réels peuvent varier.</div>
+<button class="restrt no-print" onclick="showView('vl')">↺ Recommencer une simulation</button>
+`;
+
+  // Charts after render
+  setTimeout(()=>{
+    // Year bar chart
+    const yc=document.getElementById('yrchart');
+    if(yc){new Chart(yc,{type:'bar',data:{
+      labels:R.yrs.map(y=>`An ${y.y}${y.isA?' (alt.)':''}`),
+      datasets:[
+        {label:'Scolarité',data:R.yrs.map(y=>y.tuition),backgroundColor:'rgba(79,70,229,.85)',stack:'c',borderRadius:4},
+        {label:'Logement',data:R.yrs.map(y=>y.housing),backgroundColor:'rgba(217,119,6,.8)',stack:'c',borderRadius:4},
+        {label:'Vie courante',data:R.yrs.map(y=>y.living),backgroundColor:'rgba(6,182,212,.8)',stack:'c',borderRadius:4},
+        ...(R.tA>0?[{label:'Revenus',data:R.yrs.map(y=>y.inc>0?-y.inc:0),backgroundColor:'rgba(248,113,113,.75)',stack:'r',borderRadius:4}]:[]),
+      ]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${f(Math.abs(c.parsed.y))}`}}},
+      scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,ticks:{callback:v=>v<0?`-${Math.abs(v/1000)}k€`:`${v/1000}k€`},grid:{color:'rgba(0,0,0,.04)'}}}}})}
+
+    // Timeline chart
+    const tc=document.getElementById('timeline-chart');
+    if(tc){
+      const months=[];const cumul=[];let cum=0;
+      R.yrs.forEach(y=>{
+        for(let m=1;m<=S.months;m++){
+          cum+=Math.round((y.tuition/S.months)+y.housing/S.months+y.living/S.months-(y.inc/12));
+          months.push(`An ${y.y} M${m}`);cumul.push(cum);
+        }
+      });
+      new Chart(tc,{type:'line',data:{labels:months,datasets:[{label:'Budget cumulé',data:cumul,borderColor:'rgba(79,70,229,1)',backgroundColor:'rgba(79,70,229,.08)',fill:true,tension:.4,pointRadius:0,pointHoverRadius:4,borderWidth:2}]},
+      options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${f(c.parsed.y)}`}}},
+      scales:{x:{grid:{display:false},ticks:{maxTicksLimit:S.duration+1,font:{size:10}}},y:{ticks:{callback:v=>`${v/1000}k€`},grid:{color:'rgba(0,0,0,.04)'}}}}})}
+  },150);
+}
+
+function switchTab(n){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('act',i===n));
+  document.querySelectorAll('.tpane').forEach((p,i)=>p.classList.toggle('act',i===n));
+  if(n===1||n===2)setTimeout(()=>{renderResults();switchTab(n);},10);
+}
+function copyShareLink(){copyLink();const el=document.getElementById('share-notice');if(el){el.style.display='flex';setTimeout(()=>el.style.display='none',2500);}}
+
+// ══════════════════════════════════════
+// COMPARE VIEW
+// ══════════════════════════════════════
+function renderCompare(){
+  const all=allSchools();
+  const metrics=[
+    {l:'Scolarité / an',fn:(s,b)=>f(s.fees),best:'min',bfn:s=>s.fees},
+    {l:'Loyer moyen / mois',fn:(s,b)=>f(TIERS[getTier(s.city)].rent),best:'min',bfn:s=>TIERS[getTier(s.city)].rent},
+    {l:'Budget estimé / an',fn:(s,b)=>f(calcSchoolBudget(s).annual),best:'min',bfn:s=>calcSchoolBudget(s).annual},
+    {l:'Ville',fn:s=>s.city,best:null},
+    {l:'Note Figaro',fn:s=>s.note||s.program||'—',best:null},
+    {l:'Accréditations',fn:s=>s.accred||s.duration+'ans'||'—',best:null},
+  ];
+
+  document.getElementById('vcontent').innerHTML=`
+<div class="pt">⚖️ Comparateur multi-écoles</div>
+<div class="ps">Sélectionnez jusqu'à 3 écoles pour les comparer côte à côte.</div>
+
+<div class="cmp-grid" id="cmp-slots">
+  ${[0,1,2].map(i=>{
+    const s=cmpSchools[i];
+    return s?`<div class="cmp-slot filled">
+      <div class="cmp-sn">École ${i+1}</div>
+      <div class="cmp-name">${s.name}</div>
+      <div class="cmp-city">${s.city}</div>
+      <div class="cmp-price">${f(calcSchoolBudget(s).annual)}/an estimé</div>
+      <div class="cmp-rm" onclick="removeCmp(${i})">Retirer ✕</div>
+    </div>`:
+    `<div class="cmp-slot">
+      <div class="cmp-sn">École ${i+1}</div>
+      <div class="cmp-add">Choisissez une école ci-dessous</div>
+    </div>`;
+  }).join('')}
+</div>
+
+<div class="sect-lbl" style="margin-bottom:.6rem">Ajouter une école</div>
+<div class="cmp-sel-area">
+  ${all.map((s,i)=>`<button class="cmp-school-btn ${cmpSchools.some(c=>c.name===s.name&&c.type===s.type)?'added':''}" onclick="addCmp(${i})">
+    ${s.name}${s.program?' ('+s.program+')':''}<br>
+    <span style="font-size:.71rem;color:var(--txt3)">${s.city} · ${f(s.fees)}/an</span>
+  </button>`).join('')}
+</div>
+
+${cmpSchools.length>=2?`
+<div style="overflow-x:auto;margin-top:1.25rem">
+<table class="cmp-tbl">
+  <thead><tr>
+    <th>Critère</th>
+    ${cmpSchools.map(s=>`<th>${s.name}</th>`).join('')}
+  </tr></thead>
+  <tbody>
+    ${metrics.map(m=>{
+      const vals=cmpSchools.map(s=>m.bfn?m.bfn(s):null);
+      const best=m.best==='min'?Math.min(...vals):m.best==='max'?Math.max(...vals):null;
+      return`<tr>
+        <td>${m.l}</td>
+        ${cmpSchools.map((s,i)=>`<td class="${m.bfn&&vals[i]===best?'best-v':''}">${m.fn(s)}</td>`).join('')}
+      </tr>`;
+    }).join('')}
+  </tbody>
+</table>
+</div>
+`:'<div class="ntc nb" style="margin-top:.875rem"><span class="ni">ℹ️</span>Sélectionnez au moins 2 écoles pour afficher la comparaison.</div>'}
+`;
+}
+const _allSchools=allSchools();
+function addCmp(i){if(cmpSchools.length>=3)return;const s=_allSchools[i];if(!cmpSchools.some(c=>c.name===s.name))cmpSchools.push(s);renderCompare();}
+function removeCmp(i){cmpSchools.splice(i,1);renderCompare();}
+
+// ══════════════════════════════════════
+// RANKING VIEW
+// ══════════════════════════════════════
+function renderRanking(){
+  const all=allSchools();
+  const filtered=rkFilter==='all'?all:all.filter(s=>s.type===rkFilter);
+  const sorted=[...filtered].sort((a,b)=>calcSchoolBudget(a).annual-calcSchoolBudget(b).annual);
+
+  document.getElementById('rkcontent').innerHTML=`
+<div class="pt">🏆 Classement par budget</div>
+<div class="ps">57 écoles triées par budget total estimé / an (scolarité + logement studio + vie courante standard).</div>
+<div class="rf">
+  ${[{v:'all',l:'Toutes (57)'},{v:'post-prepa',l:'Post-Prépa (22)'},{v:'post-bac',l:'Post-Bac (15)'},{v:'bachelor',l:'Bachelor (20)'}].map(f=>`
+    <button class="rfb ${rkFilter===f.v?'act':''}" onclick="rkFilter='${f.v}';renderRanking()">${f.l}</button>`).join('')}
+</div>
+${sorted.map((s,i)=>{
+  const b=calcSchoolBudget(s);
+  return`<div class="rk ${i<3?'top3':''}" onclick="startFromSchool('${s.type}','${s.name}')">
+    <div class="rk-n">${i+1}</div>
+    <div>
+      <div class="rk-nm">${s.name}${s.program?' · '+s.program:''}</div>
+      <div class="rk-city">${s.city} · <span class="tag ${s.type==='post-prepa'?'tag-p':s.type==='bachelor'?'tag-a':'tag-g'}">${s.type==='post-prepa'?'PGE':s.type==='post-bac'?'Post-Bac':'Bachelor'}</span></div>
+    </div>
+    <div class="rk-bud">
+      <div class="rk-v">${f(b.annual)}/an</div>
+      <div class="rk-l">${f(s.fees)}/an scolarité</div>
+    </div>
+  </div>`;}).join('')}
+<div class="ntc nb" style="margin-top:1rem"><span class="ni">ℹ️</span>Budget estimé = scolarité + studio + vie standard (250€ bouffe, transports en commun, 100€ loisirs). Cliquez sur une école pour la simuler.</div>
+`;
+}
+
+// ══════════════════════════════════════
+// FINDER VIEW
+// ══════════════════════════════════════
+let finderBudget=25000;
+function renderFinder(results){
+  document.getElementById('fcontent').innerHTML=`
+<div class="pt">🔍 Trouver des écoles dans mon budget</div>
+<div class="ps">Entrez votre budget maximum annuel et découvrez quelles écoles y correspondent.</div>
+<div class="finder-h">
+  <div class="finder-t">Quel est votre budget annuel maximum ?</div>
+  <div class="finder-s">Scolarité + logement studio + vie courante standard</div>
+  <div class="finder-row">
+    <input type="number" class="finder-inp" id="finder-inp" value="${finderBudget}" min="5000" max="60000" step="500" placeholder="ex: 25000">
+    <button class="finder-btn" onclick="runFinder()">Rechercher →</button>
+  </div>
+</div>
+${results!==undefined?renderFinderResults(results):''}
+`;
+}
+function runFinder(){
+  finderBudget=parseInt(document.getElementById('finder-inp').value)||25000;
+  const all=allSchools();
+  const results=all.filter(s=>calcSchoolBudget(s).annual<=finderBudget).sort((a,b)=>calcSchoolBudget(a).annual-calcSchoolBudget(b).annual);
+  renderFinder(results);
+}
+function renderFinderResults(results){
+  if(!results.length)return`<div class="finder-none">😕 Aucune école ne correspond à ce budget.<br><span style="font-size:.8rem;color:var(--txt3)">Essayez d'augmenter le budget ou de changer les paramètres.</span></div>`;
+  return`<div style="margin-bottom:.875rem;font-size:.85rem;color:var(--txt2);font-weight:600">✅ <strong style="color:var(--gn)">${results.length} école${results.length>1?'s':''}</strong> dans votre budget de ${f(finderBudget)}/an</div>
+<div class="finder-r-grid">
+  ${results.map(s=>{const b=calcSchoolBudget(s);return`<div class="finder-card" onclick="startFromSchool('${s.type}','${s.name}')">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.4rem">
+      <span class="tag ${s.type==='post-prepa'?'tag-p':s.type==='bachelor'?'tag-a':'tag-g'}">${s.type==='post-prepa'?'PGE':s.type==='post-bac'?'Post-Bac':'Bachelor'}</span>
+    </div>
+    <div class="fc-name">${s.name}${s.program?' · '+s.program:''}</div>
+    <div class="fc-city">📍 ${s.city}</div>
+    <div class="fc-bud">${f(b.annual)}/an</div>
+    <div class="fc-fees">${f(s.fees)}/an de scolarité · Simuler →</div>
+  </div>`;}).join('')}
+</div>`;
+}
+
+// ══════════════════════════════════════
+// HANDLERS
+// ══════════════════════════════════════
+function setCursus(v){S.cursus=v;S.school=null;S.duration=v==='post-bac'?5:3;renderWizard()}
+function setSchool(i){S.school=i===''?null:SCHOOLS[S.cursus][parseInt(i)];if(S.cursus==='bachelor'&&S.school)S.duration=S.school.duration;renderWizard()}
+function setDur(d){S.duration=d;renderWizard()}
+function setAlt(v){S.alternance=v;renderWizard()}
+function setHousing(v){S.housing=v;if(v==='parents')S.apl=false;renderWizard()}
+function toggleApl(){S.apl=!S.apl;renderWizard()}
+function setFood(v){S.food=v;renderWizard()}
+function setTr(v){S.transport=v;renderWizard()}
+function setMonths(n){S.months=n;renderResults()}
+function nxt(){if(S.step<6){S.step++;renderWizard()}}
+function prv(){if(S.step>1){S.step--;renderWizard()}}
+
+function startFromSchool(type,name){
+  S={step:1,cursus:type,school:SCHOOLS[type].find(s=>s.name===name)||null,duration:3,alternance:false,housing:'studio',apl:false,food:250,transport:'tc',leisure:100,misc:50,months:10};
+  if(S.school&&type==='bachelor')S.duration=S.school.duration;
+  if(S.school)S.step=4;
+  showView('vw');renderWizard();
+}
+
+function startWizard(){
+  S={step:1,cursus:null,school:null,duration:3,alternance:false,housing:null,apl:false,food:250,transport:'tc',leisure:100,misc:50,months:10};
+  showView('vw');renderWizard();
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+(function init(){
+  // Check URL params first
+  if(loadFromURL()){doResults();return;}
+  // Check saved simulation
+  if(localStorage.getItem('eb-state')){
+    document.getElementById('saved-band').classList.add('show');
+  }
+})();
+</script>
+</body>
+</html>
