@@ -1157,6 +1157,14 @@ function setFood(v){S.food=v;renderWizard()}
 function setTr(v){S.transport=v;renderWizard()}
 function setMonths(n){S.months=n;renderResults()}
 function nxt(){if(S.step<6){S.step++;renderWizard();window.scrollTo({top:0,behavior:'smooth'});}}
+function nxt2(){
+  if(S.step===2){
+    const sel=document.querySelector('.ssel');
+    if(!S.school&&sel&&sel.value!=='')S.school=SCHOOLS[S.cursus][parseInt(sel.value)];
+    if(!S.school)return;
+  }
+  nxt();
+}
 function prv(){if(S.step>1){S.step--;renderWizard();window.scrollTo({top:0,behavior:'smooth'});}}
 
 function startWizard(){
